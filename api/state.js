@@ -1,6 +1,6 @@
 /* GET /api/state?id=<jogador>&key=<chave do apresentador>
    Todos os celulares e o telão consultam isto a cada ~2 s. */
-const { redis, toObj, K, questions, effective, points, hostOK, fail } = require('./_lib');
+const { redis, run, toObj, K, effective, points, hostOK, fail } = require('./_lib');
 
 module.exports = async (req, res) => {
   try {
@@ -9,9 +9,9 @@ module.exports = async (req, res) => {
     const { id, key } = req.query || {};
     const isHost = hostOK(key);
 
-    const [gRaw, nPlayers] = await redis([['HGETALL', K.game], ['HLEN', K.players]]);
+    const { questions, res: [gRaw, nPlayers] } = await run([['HGETALL', K.game], ['HLEN', K.players]]);
     const g = toObj(gRaw);
-    const phase = effective(g, now);
+    const phase = effective(g, now, questions);
     const q = g.q !== undefined ? +g.q : -1;
     const Q = questions[q];
 

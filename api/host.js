@@ -1,6 +1,6 @@
 /* POST /api/host  {key, action}   action: start | reveal | next | reset
    Só o apresentador (que sabe a HOST_KEY) consegue chamar. */
-const { redis, toObj, K, questions, getBody, hostOK, fail } = require('./_lib');
+const { redis, run, toObj, K, MAX_Q, getBody, hostOK, fail } = require('./_lib');
 
 module.exports = async (req, res) => {
   try {
@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
     } else if (action === 'reveal') {
       await redis([['HSET', K.game, 'phase', 'reveal']]);
     } else if (action === 'next') {
-      const [gRaw] = await redis([['HGETALL', K.game]]);
+      const { questions, res: [gRaw] } = await run([['HGETALL', K.game]]);
       const q = +toObj(gRaw).q;
       if (!(q >= 0) || q + 1 >= questions.length) {
         await redis([['HSET', K.game, 'phase', 'end']]);
@@ -23,9 +23,10 @@ module.exports = async (req, res) => {
         await redis([['HSET', K.game, 'phase', 'question', 'q', String(q + 1), 't0', now]]);
       }
     } else if (action === 'reset') {
+      /* apaga jogo, jogadores, pontos e respostas (as perguntas editadas continuam salvas) */
       await redis([
         ['DEL', K.game], ['DEL', K.players], ['DEL', K.score],
-        ...questions.map((_, i) => ['DEL', K.ans(i)]),
+        ...Array.from({ length: MAX_Q }, (_, i) => ['DEL', K.ans(i)]),
       ]);
     } else {
       return res.status(400).json({ error: 'Ação desconhecida.' });
