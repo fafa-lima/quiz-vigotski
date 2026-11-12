@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Quiz · Vigotski</title>
+<style>
+:root{--bg:#0b1829;--surface:#112240;--surface2:#172d52;--border:#1e3a6e;--blue:#4f9cf9;--teal:#3ecfb2;--orange:#f9a84f;--pink:#c084fc;--text:#e8f0fe;--muted:#8aa9d3;--white:#fff}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,Arial,sans-serif}
+body{min-height:100dvh;display:flex;flex-direction:column}
+button,input{font:inherit}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);padding-top:max(12px,env(safe-area-inset-top))}
+.brand{display:flex;gap:10px;align-items:center;font-weight:900;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--teal));display:grid;place-items:center;color:#fff;font-weight:950}
+#who{font-size:13px;font-weight:800;color:var(--teal);max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{flex:1;display:flex;flex-direction:column;padding:18px 16px max(18px,env(safe-area-inset-bottom));gap:14px;width:min(640px,100%);margin:0 auto}
+h1{font-size:clamp(34px,10vw,52px);line-height:1;letter-spacing:-.05em;margin:8px 0;color:var(--white);font-weight:950}
+h2{font-size:24px;line-height:1.2;margin:0;color:var(--white);letter-spacing:-.02em}
+.muted{color:var(--muted)}.center{text-align:center}
+.eyebrow{font-size:11px;font-weight:950;letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}
+input{width:100%;padding:16px 18px;border-radius:16px;border:2px solid var(--border);background:var(--surface);color:var(--white);font-size:20px;outline:0}
+input:focus{border-color:var(--blue)}
+.btn{border:0;border-radius:16px;padding:16px 22px;background:var(--blue);color:#fff;font-weight:900;font-size:18px;width:100%}
+.btn:disabled{opacity:.5}
+.err{color:#ff8a8a;font-weight:700;min-height:1.3em}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px}
+.timer{height:8px;border-radius:99px;background:var(--border);overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--teal),var(--blue));transition:width .25s linear}
+.timer.low i{background:var(--orange)}
+.q{font-size:clamp(19px,5vw,26px);font-weight:900;line-height:1.25;color:var(--white)}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;border:0;border-radius:18px;padding:16px;min-height:72px;font-weight:800;font-size:clamp(16px,4.4vw,20px);line-height:1.25;color:#0b1829}
+.opt i{font-style:normal;font-size:24px;flex-shrink:0;width:30px;text-align:center}
+.opt:active:not(:disabled){transform:scale(.98)}
+.o0{background:var(--blue)}.o1{background:var(--teal)}.o2{background:var(--orange)}.o3{background:var(--pink)}
+.opt.dim{opacity:.35}.opt.right{outline:4px solid #fff}
+.big{font-size:64px;text-align:center;margin:6px 0}
+.pts{font-size:42px;font-weight:950;text-align:center;color:var(--teal)}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-weight:800}
+.row:last-child{border-bottom:0}.row b{color:var(--teal)}
+.pulse{animation:p 1.6s ease-in-out infinite}@keyframes p{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="mark">V</span><span>Quiz · Vigotski</span></div>
+  <div id="who"></div>
+</header>
+<main id="app"></main>
+
+<script>
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const SHAPES = ['▲', '●', '■', '◆'];
+let me = null;
+try { me = JSON.parse(localStorage.getItem('vq-me') || 'null'); } catch (e) {}
+let S = null, offset = 0, view = '', sending = false, notice = '';
+
+/* ---------- utilidades ---------- */
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function setView(key, html){ if (key !== view) { view = key; app.innerHTML = html; } }
+
+async function poll(){
+  try {
+    const r = await fetch('/api/state?id=' + encodeURIComponent(me ? me.id : ''), {cache:'no-store'});
+    const s = await r.json();
+    if (s.error) throw new Error(s.error);
+    offset = s.now - Date.now(); S = s;
+    if (me && s.you === null) { notice = 'O jogo foi reiniciado. Entre de novo.'; me = null; try { localStorage.removeItem('vq-me'); } catch (e) {} }
+    render();
+  } catch (e) {
+    $('#who').textContent = 'sem conexão…';
+    return;
+  }
+  $('#who').textContent = me ? me.name : '';
+}
+setInterval(poll, 1800); poll();
+
+/* ---------- entrar ---------- */
+function joinHTML(){
+  return `<div class="eyebrow">Seminário · Psicologia da Educação</div>
+    <h1>Quiz <span style="color:var(--blue)">Vigotski.</span></h1>
+    <p class="muted" style="margin:0">Digite seu nome para entrar. Acertar rápido vale mais pontos!</p>
+    <input id="nm" maxlength="20" placeholder="Seu nome" autocomplete="off" autocapitalize="words">
+    <div class="err" id="err">${esc(notice)}</div>
+    <button class="btn" id="go">Entrar</button>`;
+}
+async function join(){
+  const name = $('#nm').value.trim();
+  if (!name) { $('#err').textContent = 'Digite um nome.'; return; }
+  $('#go').disabled = true;
+  try {
+    const r = await fetch('/api/join', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name})});
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || 'Erro');
+    me = {id:j.id, name:j.name}; notice = '';
+    try { localStorage.setItem('vq-me', JSON.stringify(me)); } catch (e) {}
+    view = ''; poll();
+  } catch (e) { $('#err').textContent = e.message; $('#go').disabled = false; }
+}
+app.addEventListener('click', e => { if (e.target.id === 'go') join(); });
+app.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'nm') join(); });
+
+/* ---------- responder ---------- */
+async function answer(c){
+  if (sending || !S || S.you.answered) return;
+  sending = true;
+  S.you.answered = true; S.you.choice = c; view = '';  /* resposta otimista */
+  render();
+  try { await fetch('/api/answer', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({id:me.id, choice:c})}); } catch (e) {}
+  sending = false; poll();
+}
+app.addEventListener('click', e => { const b = e.target.closest('.opt[data-c]'); if (b && !b.disabled) answer(+b.dataset.c); });
+
+/* ---------- telas ---------- */
+function remaining(){
+  if (!S || !S.question) return 0;
+  return S.question.limit - (Date.now() + offset - S.t0) / 1000;
+}
+function render(){
+  if (!S) return;
+  if (!me) { setView('join', joinHTML()); return; }
+  const y = S.you || {score:0};
+  const Q = S.question;
+
+  if (S.phase === 'lobby'){
+    setView('lobby', `<div class="center" style="margin-top:24px"><div class="big">🎉</div><h2>Você está dentro, ${esc(me.name)}!</h2>
+      <p class="muted pulse">Aguardando o apresentador iniciar…</p><p class="muted">${S.nPlayers} ${S.nPlayers === 1 ? 'pessoa' : 'pessoas'} na sala</p></div>`);
+  }
+  else if (S.phase === 'question'){
+    if (y.answered){
+      setView('sent' + S.q, `<div class="center" style="margin-top:24px"><div class="big">✅</div><h2>Resposta enviada!</h2>
+        <p class="muted pulse">Aguarde o resultado…</p></div>`);
+    } else {
+      setView('q' + S.q, `<div class="eyebrow">Pergunta ${Q.n} de ${S.total}</div>
+        <div class="timer" id="tm"><i></i></div>
+        <div class="q">${esc(Q.text)}</div>
+        <div class="opts">${Q.options.map((o, i) => `<button class="opt o${i}" data-c="${i}"><i>${SHAPES[i]}</i><span>${esc(o)}</span></button>`).join('')}</div>`);
+      tickTimer();
+    }
+  }
+  else if (S.phase === 'reveal'){
+    let big, head, extra = '';
+    if (!y.answered){ big = '⏱'; head = 'Sem resposta'; }
+    else if (y.correct){ big = '🎯'; head = 'Acertou!'; extra = `<div class="pts">+${y.gained}</div>`; }
+    else { big = '❌'; head = 'Não foi dessa vez'; }
+    setView('rv' + S.q + (y.answered ? 'a' : 'n'), `<div class="center"><div class="big">${big}</div><h2>${head}</h2>${extra}</div>
+      <div class="card"><div class="eyebrow">Resposta certa</div>
+        <p style="margin:6px 0 10px;font-weight:800;color:var(--white)">${SHAPES[S.correct]} ${esc(Q.options[S.correct])}</p>
+        <p class="muted" style="margin:0;line-height:1.5">${esc(S.explanation || '')}</p></div>
+      <div class="card"><div class="row"><span>Sua pontuação</span><b>${y.score}</b></div>
+        <div class="row"><span>Sua posição</span><b>${y.rank || '–'}º de ${y.of || S.nPlayers}</b></div></div>
+      <p class="muted center pulse" style="margin:4px 0 0">Aguarde a próxima pergunta…</p>`);
+  }
+  else if (S.phase === 'end'){
+    const medal = y.rank === 1 ? '🥇' : y.rank === 2 ? '🥈' : y.rank === 3 ? '🥉' : '🏁';
+    setView('end', `<div class="center" style="margin-top:12px"><div class="big">${medal}</div><h2>Fim do quiz!</h2>
+        <p class="muted" style="margin:6px 0 0">Você ficou em <b style="color:var(--white)">${y.rank || '–'}º</b> lugar com</p><div class="pts">${y.score} pts</div></div>
+      <div class="card"><div class="eyebrow" style="margin-bottom:6px">Top 10</div>
+        ${(S.board || []).map((b, i) => `<div class="row"><span>${i + 1}. ${esc(b.name)}</span><b>${b.score}</b></div>`).join('')}</div>`);
+  }
+}
+function tickTimer(){
+  const el = $('#tm'); if (!el || !S || !S.question) return;
+  const left = remaining(), pct = Math.max(0, Math.min(100, left / S.question.limit * 100));
+  el.firstElementChild.style.width = pct + '%';
+  el.classList.toggle('low', left < 6);
+  if (left <= 0) { document.querySelectorAll('.opt').forEach(b => b.disabled = true); }
+}
+setInterval(tickTimer, 250);
+</script>
+</body>
+</html>

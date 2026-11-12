@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Telão · Quiz Vigotski</title>
+<style>
+:root{--bg:#0b1829;--surface:#112240;--surface2:#172d52;--border:#1e3a6e;--blue:#4f9cf9;--teal:#3ecfb2;--orange:#f9a84f;--pink:#c084fc;--text:#e8f0fe;--muted:#8aa9d3;--white:#fff}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(1200px 640px at 85% -10%,#183463 0%,var(--bg) 62%) fixed;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,Arial,sans-serif}
+body{min-height:100vh;display:flex;flex-direction:column}
+button{font:inherit;cursor:pointer;color:inherit}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px clamp(16px,3vw,40px);flex-wrap:wrap}
+.brand{display:flex;gap:10px;align-items:center;font-weight:900;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.mark{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--teal));display:grid;place-items:center;color:#fff;font-weight:950}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:0;border-radius:99px;padding:12px 24px;background:var(--blue);color:#fff;font-weight:900;font-size:16px}
+.btn.alt{background:var(--surface2);border:1px solid var(--border);font-size:13px;padding:9px 16px;font-weight:800}
+.btn:disabled{opacity:.4}
+.pill{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:800;color:var(--muted)}
+main{flex:1;padding:8px clamp(18px,5vw,80px) 28px;width:min(1300px,100%);margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:12px;font-weight:950;letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}
+h1{font-size:clamp(44px,8vw,100px);line-height:.95;letter-spacing:-.06em;margin:0;font-weight:950;color:var(--white)}
+.muted{color:var(--muted)}
+.lobby{display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(20px,4vw,56px);align-items:center;margin:auto 0}
+.qr{background:#fff;border-radius:28px;padding:18px;display:grid;place-items:center;min-height:240px}
+.qr img{width:100%;max-width:360px;display:block}
+.url{font-size:clamp(18px,2.6vw,32px);font-weight:900;color:var(--white);word-break:break-all;margin:14px 0}
+.names{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;max-height:30vh;overflow:auto}
+.chip{background:#ffffff14;border:1px solid #ffffff30;border-radius:99px;padding:6px 14px;font-weight:800;font-size:15px}
+.big-n{font-size:clamp(60px,10vw,130px);font-weight:950;color:var(--teal);line-height:1}
+.timer{height:12px;border-radius:99px;background:var(--border);overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--teal),var(--blue));transition:width .25s linear}
+.timer.low i{background:var(--orange)}
+.q{font-size:clamp(28px,4.6vw,60px);font-weight:950;line-height:1.1;letter-spacing:-.03em;color:var(--white)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.opt{position:relative;display:flex;gap:14px;align-items:center;border-radius:22px;padding:clamp(14px,2vw,26px);font-weight:850;font-size:clamp(17px,2.2vw,30px);line-height:1.2;color:#0b1829;overflow:hidden}
+.opt i{font-style:normal;font-size:clamp(22px,3vw,40px);flex-shrink:0}
+.o0{background:var(--blue)}.o1{background:var(--teal)}.o2{background:var(--orange)}.o3{background:var(--pink)}
+.opt.dim{opacity:.3}.opt.right{outline:6px solid #fff;outline-offset:-2px}
+.opt .cnt{margin-left:auto;font-size:clamp(22px,3vw,44px);font-weight:950;flex-shrink:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:clamp(16px,2.4vw,28px)}
+.expl{font-size:clamp(16px,1.9vw,24px);line-height:1.5;color:#c6d7f2}
+.board{display:grid;gap:8px}
+.brow{display:flex;justify-content:space-between;gap:12px;padding:12px 18px;border-radius:14px;background:var(--surface2);font-weight:850;font-size:clamp(16px,2vw,26px)}
+.brow b{color:var(--teal)}
+.brow:nth-child(1){border-left:6px solid #ffd166}.brow:nth-child(2){border-left:6px solid #cbd5e1}.brow:nth-child(3){border-left:6px solid #d08a52}
+.end{text-align:center;margin:auto 0}
+.banner{background:#3a1f1f;border:1px solid #8a3a3a;color:#ffb4b4;padding:10px 16px;border-radius:14px;font-weight:700}
+@media(max-width:900px){.lobby{grid-template-columns:1fr}.opts{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand"><span class="mark">V</span><span>Telão · Quiz Vigotski</span></div>
+  <div class="ctl">
+    <span class="pill" id="pCount">0 na sala</span>
+    <button class="btn alt" id="btnReset">↺ Reiniciar</button>
+    <button class="btn" id="btnMain">Iniciar</button>
+  </div>
+</div>
+<main id="app"></main>
+
+<script>
+const $ = s => document.querySelector(s);
+const SHAPES = ['▲', '●', '■', '◆'];
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let KEY = sessionStorage.getItem('vq-host-key') || '';
+if (!KEY) { KEY = prompt('Chave do apresentador (HOST_KEY):') || ''; sessionStorage.setItem('vq-host-key', KEY); }
+let S = null, offset = 0, view = '', busy = false;
+
+async function poll(){
+  try {
+    const r = await fetch('/api/state?key=' + encodeURIComponent(KEY), {cache:'no-store'});
+    const s = await r.json();
+    if (s.error) throw new Error(s.error);
+    offset = s.now - Date.now(); S = s; render();
+  } catch (e) { $('#pCount').textContent = 'sem conexão…'; }
+}
+setInterval(poll, 1500); poll();
+
+async function act(action){
+  if (busy) return; busy = true;
+  try {
+    const r = await fetch('/api/host', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({key:KEY, action})});
+    const j = await r.json();
+    if (!r.ok) {
+      if (r.status === 401) { sessionStorage.removeItem('vq-host-key'); KEY = prompt('Chave incorreta. Digite de novo:') || ''; sessionStorage.setItem('vq-host-key', KEY); }
+      else alert(j.error || 'Erro');
+    }
+  } catch (e) { alert('Sem conexão com o servidor.'); }
+  busy = false; view = ''; poll();
+}
+$('#btnReset').onclick = () => { if (confirm('Reiniciar o quiz? Todos os jogadores e pontos serão apagados.')) act('reset'); };
+function mainAction(){
+  if (!S) return;
+  if (S.phase === 'lobby') act('start');
+  else if (S.phase === 'question') act('reveal');
+  else if (S.phase === 'reveal') act('next');
+  else if (S.phase === 'end') { if (confirm('Reiniciar o quiz?')) act('reset'); }
+}
+$('#btnMain').onclick = mainAction;
+document.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'ArrowRight' || e.key === 'Enter') { if (e.target.tagName === 'BUTTON') return; e.preventDefault(); mainAction(); }
+});
+
+function setView(key, html){ if (key !== view) { view = key; $('#app').innerHTML = html; } }
+const remaining = () => S && S.question ? S.question.limit - (Date.now() + offset - S.t0) / 1000 : 0;
+
+function render(){
+  if (!S) return;
+  $('#pCount').textContent = `${S.nPlayers} ${S.nPlayers === 1 ? 'pessoa' : 'pessoas'} na sala`;
+  const labels = {lobby:'Iniciar quiz', question:'Mostrar resposta', reveal: S.q + 1 >= S.total ? 'Ver resultado final' : 'Próxima pergunta', end:'Reiniciar quiz'};
+  $('#btnMain').textContent = labels[S.phase] + ' →';
+  const warn = S.host ? '' : '<div class="banner">Chave do apresentador incorreta ou HOST_KEY não definida: os botões não vão funcionar.</div>';
+  const Q = S.question;
+
+  if (S.phase === 'lobby'){
+    const url = location.origin + '/';
+    setView('lobby' + S.host, `${warn}<div class="lobby"><div>
+        <div class="eyebrow">Quiz ao vivo · Psicologia da Educação</div>
+        <h1>Entre no quiz <span style="color:var(--blue)">Vigotski.</span></h1>
+        <div class="url">${esc(url.replace(/^https?:\/\//, ''))}</div>
+        <p class="muted" style="margin:0;font-size:18px">Aponte a câmera para o QR code e digite seu nome.</p>
+        <div class="names" id="names"></div></div>
+      <div class="qr"><img alt="QR code" src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=4&data=${encodeURIComponent(url)}"></div></div>`);
+    $('#names').innerHTML = (S.names || []).map(n => `<span class="chip">${esc(n)}</span>`).join('');
+  }
+  else if (S.phase === 'question'){
+    if (view !== 'q' + S.q) setView('q' + S.q, `${warn}<div style="display:flex;justify-content:space-between;align-items:end;gap:16px">
+        <div class="eyebrow">Pergunta ${Q.n} de ${S.total}</div>
+        <div style="text-align:right"><div class="big-n" id="ans">0</div><div class="muted" style="font-weight:800">responderam</div></div></div>
+      <div class="timer" id="tm"><i></i></div>
+      <div class="q">${esc(Q.text)}</div>
+      <div class="opts">${Q.options.map((o, i) => `<div class="opt o${i}"><i>${SHAPES[i]}</i><span>${esc(o)}</span></div>`).join('')}</div>`);
+    const a = $('#ans'); if (a) a.textContent = S.answered ?? 0;
+    tick();
+  }
+  else if (S.phase === 'reveal'){
+    setView('rv' + S.q, `${warn}<div class="eyebrow">Pergunta ${Q.n} de ${S.total} · resposta</div>
+      <div class="q">${esc(Q.text)}</div>
+      <div class="opts">${Q.options.map((o, i) => `<div class="opt o${i} ${i === S.correct ? 'right' : 'dim'}"><i>${SHAPES[i]}</i><span>${esc(o)}</span><span class="cnt">${S.dist[i]}</span></div>`).join('')}</div>
+      <div class="card expl">${esc(S.explanation || '')}</div>
+      <div class="card"><div class="eyebrow" style="margin-bottom:10px">Placar</div><div class="board">
+        ${(S.board || []).map((b, i) => `<div class="brow"><span>${i + 1}. ${esc(b.name)}</span><b>${b.score}</b></div>`).join('')}</div></div>`);
+  }
+  else {
+    setView('end', `${warn}<div class="end"><div class="eyebrow">Fim do quiz</div><h1 style="margin:10px 0 28px">Resultado <span style="color:var(--teal)">final</span></h1>
+      <div class="board" style="max-width:760px;margin:0 auto;text-align:left">
+        ${(S.board || []).map((b, i) => `<div class="brow"><span>${['🥇', '🥈', '🥉'][i] || (i + 1) + '.'} ${esc(b.name)}</span><b>${b.score}</b></div>`).join('')}</div></div>`);
+  }
+}
+function tick(){
+  const el = $('#tm'); if (!el || !S || !S.question) return;
+  const left = remaining(), pct = Math.max(0, Math.min(100, left / S.question.limit * 100));
+  el.firstElementChild.style.width = pct + '%';
+  el.classList.toggle('low', left < 6);
+}
+setInterval(tick, 250);
+</script>
+</body>
+</html>
