@@ -3,176 +3,282 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070f1d">
-<title>Admin · Quiz Vigotski</title>
+<meta name="theme-color" content="#ffffff">
+<title>Editor · Quiz Vigotski</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#070f1d;--surface:#ffffff0d;--surface2:#ffffff14;--border:#ffffff1f;--field:#0a1526;
-  --blue:#4f9cf9;--teal:#3ecfb2;--orange:#f9a84f;--pink:#c084fc;--red:#ff7b7b;
-  --text:#e8f0fe;--muted:#93aed6;--white:#fff;
-  --g0:linear-gradient(135deg,#63aaff,#3b7ee8);--g1:linear-gradient(135deg,#4fe0c3,#25ab94);
-  --g2:linear-gradient(135deg,#ffb95e,#f08a24);--g3:linear-gradient(135deg,#d09bff,#a05cf0);
+  --purple:#46178f;--purple2:#5b2aa8;--purple-d:#34106e;--purple-s:#f0e9fb;--purple-m:#d9c8f3;
+  --red:#e21b3c;--blue:#1368ce;--yellow:#d89e00;--green:#26890c;
+  --bg:#f5f3f9;--card:#fff;--line:#e5e1ee;--ink:#2b2438;--muted:#7a7388;
+  --ok:#1f8a3b;--warn:#b45309;--bad:#c4162f;
+  --sh:0 1px 2px rgba(30,15,60,.06),0 8px 24px rgba(30,15,60,.06);
+  --font:Montserrat,"Segoe UI",Helvetica,Arial,sans-serif;
+  --top:60px;--rail:84px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,"Segoe UI",ui-sans-serif,system-ui,Arial,sans-serif}
-body{padding-bottom:120px}
-button,input,textarea{font:inherit;color:inherit}
-button,a{cursor:pointer;touch-action:manipulation}
-.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;background:var(--bg)}
-.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.4}
-.aurora i:nth-child(1){width:60vmax;height:60vmax;background:#1d4ed8;left:-24vmax;top:-30vmax}
-.aurora i:nth-child(2){width:46vmax;height:46vmax;background:#0f9e8a;right:-22vmax;top:30vh;opacity:.25}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--font)}
+button,input,textarea,select{font:inherit;color:inherit}
+button,a,summary,label{cursor:pointer;touch-action:manipulation}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 
-header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top));background:#070f1dd9;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
-.brand{display:flex;gap:10px;align-items:center;font-weight:900;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.mark{width:32px;height:32px;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--teal));display:grid;place-items:center;color:#fff;font-weight:950;box-shadow:0 6px 18px #4f9cf955}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:14px;padding:11px 16px;background:linear-gradient(135deg,#5aa6ff,#3b7ee8);color:#fff;font-weight:900;font-size:15px;text-decoration:none;transition:transform .12s,opacity .2s}
-.btn:active{transform:scale(.97)}
-.btn.alt{background:var(--surface2);border:1px solid var(--border);font-weight:800;font-size:14px;padding:10px 14px}
-.btn.teal{background:linear-gradient(135deg,#4fe0c3,#25ab94);color:#04201b;box-shadow:0 10px 26px #25ab9455}
-.btn.danger{background:transparent;border:1px solid #6b2f2f;color:var(--red);font-weight:800;font-size:14px;padding:10px 14px}
-.btn.big{padding:14px 28px;font-size:17px;border-radius:16px}
-.btn:disabled{opacity:.4;pointer-events:none}
-main{width:min(840px,100%);margin:0 auto;padding:18px 16px}
-h1{font-size:clamp(28px,6vw,38px);margin:4px 0 6px;color:var(--white);letter-spacing:-.04em;font-weight:950}
-.muted{color:var(--muted)}
-
-/* painel de números */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 14px}
-.stat{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:12px 14px;backdrop-filter:blur(10px)}
-.stat b{display:block;font-size:clamp(22px,5vw,30px);font-weight:950;color:var(--white);line-height:1.1}
-.stat span{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.stat.bad b{color:var(--orange)}.stat.good b{color:var(--teal)}
-.badge{display:inline-block;border-radius:99px;padding:5px 13px;font-size:12px;font-weight:800;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
-.badge.on{color:var(--teal);border-color:#3ecfb255}
-
-.tools{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
-.notice{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-radius:16px;background:#f9a84f1a;border:1px solid #f9a84f55;margin-bottom:14px;font-weight:700;line-height:1.35}
-.notice.show{display:flex}.notice .grow{flex:1;min-width:200px}
-
-/* cartões */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:22px;margin-bottom:12px;overflow:hidden;backdrop-filter:blur(10px);transition:border-color .2s,box-shadow .2s;animation:in .35s cubic-bezier(.2,.8,.2,1) backwards}
-@keyframes in{from{opacity:0;transform:translateY(10px)}}
-.card.open{border-color:#4f9cf966;box-shadow:0 12px 40px #0006}
-.card.err{border-color:var(--red);box-shadow:0 0 0 3px #ff7b7b33}
-.head{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;padding:14px 16px}
-.num{flex-shrink:0;width:36px;height:36px;border-radius:12px;background:var(--surface2);display:grid;place-items:center;font-weight:950;font-size:15px;color:var(--teal)}
-.mid{flex:1;min-width:0}
-.title{font-weight:800;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.title.empty{color:var(--muted);font-style:italic;font-weight:600}
-.meta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.tag{font-size:11px;font-weight:900;letter-spacing:.04em;padding:3px 9px;border-radius:99px;background:var(--surface2);color:var(--muted)}
-.tag.ok{background:#3ecfb226;color:var(--teal)}.tag.warn{background:#f9a84f26;color:var(--orange)}
-.chev{color:var(--muted);transition:transform .25s;font-size:18px}
-.card.open .chev{transform:rotate(180deg)}
-.body{display:none;padding:2px 16px 18px;border-top:1px solid var(--border)}
-.card.open .body{display:block}
-label.l{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:16px 0 7px}
-label.l small{font-size:11px;letter-spacing:0;text-transform:none;font-weight:700;color:var(--muted)}
-textarea,input[type=text],input[type=number]{width:100%;padding:13px 15px;border-radius:14px;border:2px solid var(--border);background:var(--field);outline:0;font-size:16px;transition:border-color .2s}
-textarea{min-height:80px;resize:vertical;line-height:1.45}
-textarea:focus,input:focus{border-color:var(--blue)}
-
-/* alternativas */
-.opt{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-.opt .dot{position:relative;flex-shrink:0;width:48px;height:48px;border-radius:15px;border:0;display:grid;place-items:center;font-weight:950;font-size:18px;color:#07121f;transition:transform .15s,box-shadow .2s,opacity .2s;opacity:.55}
-.opt .dot:active{transform:scale(.92)}
-.d0{background:var(--g0)}.d1{background:var(--g1)}.d2{background:var(--g2)}.d3{background:var(--g3)}
-.opt.good .dot{opacity:1;box-shadow:0 0 0 3px var(--bg),0 0 0 6px var(--teal)}
-.opt.good .dot::after{content:"✓";position:absolute;right:-7px;top:-9px;width:22px;height:22px;border-radius:50%;background:var(--teal);color:#04201b;font-size:13px;display:grid;place-items:center;font-weight:950}
-.opt.good input{border-color:#3ecfb299}
-.row2{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
-.presets{display:flex;gap:6px;flex-wrap:wrap}
-.pre{border:1px solid var(--border);background:var(--surface);border-radius:99px;padding:9px 14px;font-weight:800;font-size:14px}
-.pre.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.time{width:100px!important;text-align:center;font-weight:900}
-.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
-.acts .sp{flex:1}
-
-/* prévia do celular */
-.prev{display:none;margin-top:18px;padding:16px;border-radius:24px;background:linear-gradient(160deg,#0f2147,#0a1526);border:1px solid var(--border)}
-.prev.show{display:block}
-.prev .q{font-size:17px;font-weight:900;line-height:1.3;color:var(--white);margin:6px 0 12px}
-.prev .po{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;margin-bottom:7px;font-weight:800;font-size:14px;color:#07121f;min-height:48px}
-.prev .po i{font-style:normal;width:26px;height:26px;border-radius:8px;background:#07121f26;display:grid;place-items:center;font-size:13px;flex-shrink:0}
-.prev .po.ok{outline:3px solid #fff}
-.prev .ex{margin-top:10px;font-size:13px;line-height:1.45;color:var(--muted);padding:10px 12px;border-radius:12px;background:#ffffff0a}
-.prev .cap{font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
-
-/* colar em massa */
-.bulk{display:none;background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:16px;margin-bottom:14px}
-.bulk.show{display:block}
-.bulk textarea{min-height:230px;font-family:ui-monospace,Menlo,monospace;font-size:14px}
-.hint{font-size:13px;color:var(--muted);margin:8px 0 0;line-height:1.5}
-pre.ex{background:var(--field);border:1px solid var(--border);border-radius:14px;padding:12px;font-size:13px;line-height:1.55;overflow:auto;white-space:pre-wrap;color:#c6d7f2;margin:10px 0 0}
-
-/* barra de salvar */
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px max(12px,env(safe-area-inset-bottom));background:#070f1de6;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border)}
-.bar .in{display:flex;align-items:center;justify-content:space-between;gap:12px;width:min(840px,100%);margin:0 auto}
-#status{font-size:14px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:8px;min-width:0}
-#status::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0}
-#status.ok{color:var(--teal)}#status.ok::before{background:var(--teal)}
-#status.bad{color:var(--red)}#status.bad::before{background:var(--red)}
-#status.warn{color:var(--orange)}#status.warn::before{background:var(--orange);animation:pulse 1.4s infinite}
+/* ===== barra superior ===== */
+.top{position:fixed;inset:0 0 auto 0;height:var(--top);z-index:20;display:flex;align-items:center;gap:14px;padding:0 18px;background:#fff;border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:17px;color:var(--purple);white-space:nowrap}
+.logo i{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--purple2),var(--purple));color:#fff;display:grid;place-items:center;font-style:normal;font-size:19px;box-shadow:0 4px 10px rgba(70,23,143,.3)}
+.logo small{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-top:1px}
+.sp{flex:1}
+.chip{display:inline-flex;align-items:center;gap:8px;border-radius:99px;padding:7px 13px;background:#f1eff5;color:var(--muted);font-weight:700;font-size:13px;white-space:nowrap}
+.chip::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.chip.ok{background:#e4f4e8;color:var(--ok)}.chip.warn{background:#fdf0dc;color:var(--warn)}.chip.warn::before{animation:pulse 1.4s infinite}.chip.bad{background:#fde6ea;color:var(--bad)}
 @keyframes pulse{50%{opacity:.3}}
-.toast{position:fixed;left:50%;bottom:90px;z-index:20;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:13px 20px;border-radius:16px;background:#14283f;border:1px solid var(--border);font-weight:800;box-shadow:0 14px 40px #000a;transition:.3s;max-width:90vw;text-align:center}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.toast.ok{border-color:#3ecfb2aa;color:var(--teal)}.toast.bad{border-color:#ff7b7baa;color:var(--red)}
-.empty{text-align:center;padding:40px 16px;border:2px dashed var(--border);border-radius:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:11px 18px;background:linear-gradient(135deg,var(--purple2),var(--purple));color:#fff;font-weight:800;font-size:14px;text-decoration:none;box-shadow:0 4px 12px rgba(70,23,143,.28);transition:transform .1s,box-shadow .15s,opacity .2s;white-space:nowrap}
+.btn:hover{box-shadow:0 6px 16px rgba(70,23,143,.36)}
+.btn:active{transform:translateY(1px)}
+.btn.clean{background:#e9e6ef;color:#8a8398;box-shadow:none}
+.btn.out{background:#fff;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.btn.out:hover{border-color:var(--purple-m);background:#faf8fd}
+.btn.dng{background:#fff;color:var(--bad);border:1.5px solid #f1c4cc;box-shadow:none}
+.btn.sm{padding:8px 12px;font-size:13px;border-radius:10px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.35;pointer-events:none}
+
+/* ===== menu lateral ===== */
+.rail{position:fixed;left:0;top:var(--top);bottom:0;width:var(--rail);z-index:15;background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px}
+.nav{width:100%;display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:none;padding:10px 4px;border-radius:12px;color:var(--muted);font-weight:700;font-size:11px;position:relative}
+.nav:hover{background:#f6f3fb;color:var(--ink)}
+.nav.on{background:var(--purple-s);color:var(--purple)}
+.nav .live{position:absolute;right:16px;top:8px;width:9px;height:9px;border-radius:50%;background:var(--warn);animation:pulse 1.4s infinite;border:2px solid #fff}
+
+main{margin-left:var(--rail);padding:calc(var(--top) + 20px) 22px 40px}
+.pane{display:none}.pane.on{display:block;animation:in .25s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+h1{margin:0;font-size:26px;font-weight:900;letter-spacing:-.02em}
+h3{margin:0 0 4px;font-size:16px;font-weight:800}
+.muted{color:var(--muted)}
+.hint{font-size:13px;color:var(--muted);margin:8px 0 0;line-height:1.55;font-weight:500}
+.card{background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:18px}
+.lab{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
+.lab small{font-size:12px;letter-spacing:0;text-transform:none;font-weight:600}
+.banner{position:relative;display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--purple-m);border-left:4px solid var(--purple);border-radius:12px;padding:12px 40px 12px 14px;margin-bottom:14px;font-size:14px;line-height:1.5;font-weight:500}
+.banner b{font-weight:800}
+.banner .x{position:absolute;right:6px;top:6px;border:0;background:none;width:30px;height:30px;color:var(--muted);font-size:15px}
+.banner.draft{border-color:#f3d79a;border-left-color:var(--yellow);display:none;align-items:center;flex-wrap:wrap}
+.banner.draft.show{display:flex}.banner.draft .grow{flex:1;min-width:200px;font-weight:700}
+
+/* ===== editor em 3 painéis ===== */
+.q3{display:grid;grid-template-columns:232px minmax(0,1fr) 316px;gap:18px;align-items:start}
+.thumbs{position:sticky;top:calc(var(--top) + 20px);max-height:calc(100dvh - var(--top) - 40px);display:flex;flex-direction:column;background:var(--card);border-radius:16px;box-shadow:var(--sh);padding:12px}
+.thead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;padding:0 2px}
+.thead b{font-size:13px;font-weight:800}
+.thead span{font-size:12px;color:var(--muted);font-weight:700}
+#list{overflow:auto;display:flex;flex-direction:column;gap:8px;padding:2px;margin:-2px}
+.th{position:relative;text-align:left;border:2px solid var(--line);background:#fff;border-radius:12px;padding:9px 9px 8px;display:flex;flex-direction:column;gap:7px;transition:border-color .15s,box-shadow .15s,transform .15s}
+.th:hover{border-color:var(--purple-m)}
+.th.on{border-color:var(--purple);box-shadow:0 0 0 3px rgba(70,23,143,.12)}
+.th .no{position:absolute;left:-1px;top:-1px;min-width:22px;height:22px;border-radius:10px 0 10px 0;background:#ebe8f1;color:#6a6278;font-size:11px;font-weight:900;display:grid;place-items:center;padding:0 6px}
+.th.on .no{background:var(--purple);color:#fff}
+.th .tq{font-size:11px;font-weight:700;line-height:1.3;min-height:29px;padding:4px 22px 0 20px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.th .tq.blank{color:#a59fb2;font-style:italic;font-weight:600}
+.th .tg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.th .tg i{height:11px;border-radius:3px;position:relative}
+.th .tg i.ok::after{content:"";position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#fff}
+.th .tg i:not(.ok){opacity:.35}
+.th .wn{position:absolute;right:6px;top:5px;width:18px;height:18px;border-radius:50%;background:#fdf0dc;color:var(--warn);font-size:11px;font-weight:900;display:grid;place-items:center}
+.c0{background:var(--red)}.c1{background:var(--blue)}.c2{background:var(--yellow)}.c3{background:var(--green)}
+
+/* palco */
+.stage{border-radius:20px;padding:clamp(14px,2.4vw,30px);background:radial-gradient(#d8d2e6 1px,transparent 1.2px) 0 0/20px 20px,#ece9f3;box-shadow:inset 0 0 0 1px var(--line)}
+.snav{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.snav .pill{font-weight:800;font-size:13px;background:#fff;border-radius:99px;padding:8px 14px;box-shadow:0 1px 2px rgba(30,15,60,.08);margin-right:auto}
+.icb{width:38px;height:38px;border-radius:11px;border:0;background:#fff;box-shadow:0 1px 2px rgba(30,15,60,.1);display:grid;place-items:center;color:var(--ink)}
+.icb:hover{color:var(--purple)}.icb:disabled{opacity:.35;pointer-events:none}
+.qcard{background:#fff;border-radius:16px;box-shadow:0 2px 0 rgba(30,15,60,.08),0 14px 30px rgba(30,15,60,.08);padding:6px 8px 4px;margin-bottom:14px;border:2px solid transparent;transition:border-color .2s}
+.qcard:focus-within{border-color:var(--purple)}
+.qcard.err{border-color:var(--bad)}
+textarea,input[type=text]{width:100%;border:0;outline:0;background:none;resize:none}
+.qcard textarea{min-height:120px;text-align:center;font-weight:800;font-size:clamp(20px,2.4vw,28px);line-height:1.25;padding:22px 18px;display:block}
+.qcard textarea::placeholder{color:#b7b1c4}
+.qcard small{display:block;text-align:right;padding:0 12px 8px;font-size:11px;font-weight:700;color:#b0aabd}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ans{position:relative;display:flex;align-items:center;gap:12px;border-radius:14px;padding:12px 14px;min-height:92px;box-shadow:0 3px 0 rgba(0,0,0,.2),0 10px 20px rgba(30,15,60,.1);transition:transform .15s}
+.ans:focus-within{transform:translateY(-2px)}
+.ans .shp{flex-shrink:0;width:34px;height:34px}.ans .shp svg{width:100%;height:100%}
+.ans input{flex:1;min-width:0;color:#fff;font-weight:800;font-size:17px;padding:10px 4px;border-radius:8px}
+.ans input::placeholder{color:rgba(255,255,255,.65)}
+.tog{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.9);background:rgba(255,255,255,.12);display:grid;place-items:center;color:transparent;transition:.15s}
+.tog svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round}
+.tog:hover{background:rgba(255,255,255,.3)}.tog:active{transform:scale(.9)}
+.ans.good .tog{background:#fff;color:var(--ok)}
+.ans.good::after{content:"CERTA";position:absolute;right:14px;top:-9px;background:#fff;color:var(--ok);font-size:10px;font-weight:900;letter-spacing:.08em;padding:3px 9px;border-radius:99px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.sfoot{display:flex;justify-content:space-between;gap:8px;margin-top:14px}
+
+/* inspetor */
+.insp{position:sticky;top:calc(var(--top) + 20px);display:grid;gap:14px;max-height:calc(100dvh - var(--top) - 40px);overflow:auto;padding:2px;margin:-2px}
+.checks{display:grid;gap:9px;margin:0;padding:0;list-style:none}
+.checks li{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:var(--warn)}
+.checks li i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;background:#fdf0dc;flex-shrink:0}
+.checks li.ok{color:var(--ink)}.checks li.ok i{background:#e4f4e8;color:var(--ok)}
+.picks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pick{height:52px;border-radius:12px;border:3px solid transparent;display:grid;place-items:center;color:#fff;position:relative;opacity:.5;transition:.15s}
+.pick svg{width:22px;height:22px}
+.pick.on{opacity:1;border-color:#fff;box-shadow:0 0 0 3px var(--ok)}
+.pick.on::after{content:"✓";position:absolute;right:-7px;top:-9px;width:20px;height:20px;border-radius:50%;background:var(--ok);color:#fff;font-size:11px;display:grid;place-items:center;font-weight:900}
+.tval{font-size:30px;font-weight:900;color:var(--purple);line-height:1;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;background:#e4dff0;outline:0;margin:14px 0 4px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--purple);border:4px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--purple);border:4px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pre{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-weight:800;font-size:12px}
+.pre.on{background:var(--purple);border-color:var(--purple);color:#fff}
+.ex{width:100%;min-height:96px;border:1.5px solid var(--line)!important;border-radius:12px;padding:12px;font-size:14px;font-weight:500;line-height:1.5;resize:vertical;transition:border-color .2s}
+.ex:focus{border-color:var(--purple)!important}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.empty{text-align:center;padding:56px 20px;border-radius:20px;background:#fff;box-shadow:var(--sh)}
+.empty .big{width:76px;height:76px;border-radius:24px;background:var(--purple-s);color:var(--purple);display:grid;place-items:center;margin:0 auto 14px}
+.empty .big svg{width:36px;height:36px}
+
+/* ===== outras abas ===== */
+.page{max-width:980px;margin:0 auto}
+.page>h1{margin-bottom:4px}.page>.sub{margin:0 0 18px;color:var(--muted);font-weight:500}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.stack{display:grid;gap:16px}
+.hero{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.led{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#ece9f3;color:var(--muted);flex-shrink:0}
+.led.ok{background:#e4f4e8;color:var(--ok)}.led.go{background:#fdf0dc;color:var(--warn)}
+.hero .tt{flex:1;min-width:180px}.hero .tt b{display:block;font-size:20px;font-weight:900}
+.steps{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.steps li{display:flex;gap:12px;align-items:center;padding:11px 0;font-weight:700;font-size:14px;border-bottom:1px solid var(--line)}
+.steps li:last-child{border:0}
+.steps li i{font-style:normal;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;background:#fdf0dc;color:var(--warn);flex-shrink:0}
+.steps li.ok i{background:#e4f4e8;color:var(--ok)}
+.urlbox{display:flex;gap:8px;align-items:center;background:#f6f3fb;border:1px solid var(--line);border-radius:12px;padding:6px 6px 6px 14px;font-weight:700;font-size:14px;word-break:break-all}
+.urlbox span{flex:1}
+.qrs{width:170px;border-radius:14px;border:1px solid var(--line);padding:10px;background:#fff;display:block}
+#bulkTxt{width:100%;min-height:220px;border:1.5px solid var(--line);border-radius:12px;padding:14px;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:1.5;resize:vertical}
+#bulkTxt:focus{border-color:var(--purple);outline:0}
+pre.exm{background:#f6f3fb;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13px;line-height:1.55;overflow:auto;white-space:pre-wrap;margin:10px 0 0}
+select{padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-weight:700}
+.toast{position:fixed;left:50%;bottom:26px;z-index:40;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:13px 20px;border-radius:12px;background:#2b2438;color:#fff;font-weight:700;font-size:14px;box-shadow:0 12px 32px rgba(0,0,0,.3);transition:.3s;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}.toast.bad{background:var(--bad)}.toast.ok{background:var(--ok)}
+
+/* ===== tablet / celular ===== */
+@media(max-width:1180px){
+  .q3{grid-template-columns:200px minmax(0,1fr)}
+  .insp{grid-column:1 / -1;position:static;max-height:none;grid-template-columns:1fr 1fr}
+  .insp>.card:nth-child(n+4){grid-column:auto}
+}
+@media(max-width:860px){
+  :root{--top:56px}
+  .top{padding:0 12px;gap:8px}
+  .logo small,.hide-sm{display:none}
+  .rail{top:auto;bottom:0;left:0;right:0;width:100%;height:64px;flex-direction:row;justify-content:space-around;border-right:0;border-top:1px solid var(--line);padding:6px 8px max(6px,env(safe-area-inset-bottom));height:calc(64px + env(safe-area-inset-bottom))}
+  .nav{flex:1;max-width:160px;padding:7px 4px}
+  .nav .live{right:calc(50% - 22px)}
+  main{margin-left:0;padding:calc(var(--top) + 12px) 12px calc(96px + env(safe-area-inset-bottom))}
+  .q3{grid-template-columns:minmax(0,1fr)}
+  .thumbs,#editor,.insp,.stage{min-width:0}
+  .thumbs{position:static;max-height:none;padding:10px;border-radius:14px}
+  #list{flex-direction:row;overflow-x:auto;padding:2px 2px 6px}
+  .th{flex:0 0 138px}
+  .insp{position:static;grid-template-columns:1fr}
+  .agrid{grid-template-columns:1fr}
+  .ans{min-height:76px}
+  .cols{grid-template-columns:1fr}
+  .toast{bottom:calc(82px + env(safe-area-inset-bottom))}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-@media(max-width:520px){.btn.hide-sm span{display:none}#status{font-size:13px}}
 </style>
 </head>
 <body>
-<div class="aurora"><i></i><i></i></div>
-<header>
-  <div class="brand"><span class="mark">V</span><span>Admin · Quiz</span></div>
-  <div style="display:flex;gap:8px"><a class="btn alt" href="/host.html">📺 Abrir telão</a></div>
+<header class="top">
+  <div class="logo"><i>V</i><div>Quiz Vigotski<small>EDITOR DO QUIZ</small></div></div>
+  <span class="sp"></span>
+  <span class="chip" id="status">Carregando…</span>
+  <a class="btn out hide-sm" href="/host.html">Abrir telão</a>
+  <button class="btn clean" id="bSave">Salvo</button>
 </header>
 
+<nav class="rail">
+  <button class="nav on" data-tab="q"><svg class="i" viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17z"/><path d="M14 7l3 3"/></svg>Perguntas</button>
+  <button class="nav" data-tab="io"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Importar</button>
+  <button class="nav" data-tab="game"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/></svg>Jogo<span id="liveDot"></span></button>
+</nav>
+
 <main>
-  <h1>Perguntas do quiz</h1>
-  <p class="muted" style="margin:0;line-height:1.5">Toque na <b style="color:var(--white)">letra colorida</b> para marcar a resposta certa. Nada vale até tocar em <b style="color:var(--white)">Salvar</b>.</p>
+  <!-- ============ PERGUNTAS ============ -->
+  <section class="pane on" id="pane-q">
+    <div class="banner draft" id="draftBox"><span class="grow" id="draftTxt"></span>
+      <button class="btn sm" id="bRec">Recuperar</button><button class="btn out sm" id="bDisc">Descartar</button></div>
+    <div class="banner" id="how"><button class="x" id="howX" aria-label="Fechar">✕</button>
+      <div><b>Como usar:</b> escolha uma pergunta na lista, escreva o enunciado e as 4 alternativas, e toque no <b>círculo</b> da certa. Depois clique em <b>Salvar</b>, no canto superior direito.</div></div>
 
-  <div class="stats">
-    <div class="stat"><b id="sCnt">0</b><span>Perguntas</span></div>
-    <div class="stat" id="sOkBox"><b id="sOk">0</b><span>Completas</span></div>
-    <div class="stat"><b id="sDur">0 min</b><span>Duração aprox.</span></div>
-  </div>
-  <div><span class="badge" id="src">carregando…</span></div>
+    <div class="q3">
+      <aside class="thumbs">
+        <div class="thead"><b>Perguntas</b><span id="sInfo">0</span></div>
+        <button class="btn block sm" id="bAdd" style="margin-bottom:10px">＋ Nova pergunta</button>
+        <div id="list"></div>
+      </aside>
+      <section id="editor"></section>
+      <aside class="insp" id="insp"></aside>
+    </div>
+  </section>
 
-  <div class="tools">
-    <button class="btn alt" id="bAdd">＋ Nova pergunta</button>
-    <button class="btn alt" id="bBulk">📋 Colar várias</button>
-    <button class="btn alt" id="bAll">⇅ Abrir/fechar tudo</button>
-    <button class="btn danger" id="bDef">↺ Restaurar padrão</button>
-  </div>
-
-  <div class="notice" id="draftBox"><span class="grow" id="draftTxt"></span>
-    <button class="btn teal" id="bRec" style="padding:9px 14px">Recuperar</button><button class="btn alt" id="bDisc" style="padding:9px 14px">Descartar</button></div>
-
-  <div class="bulk" id="bulk">
-    <label class="l" style="margin-top:0">Cole suas perguntas <small>uma linha em branco entre elas</small></label>
-    <textarea id="bulkTxt" placeholder="Cole aqui…"></textarea>
-    <p class="hint">A 1ª linha é a pergunta; depois as alternativas <b>A)</b> <b>B)</b> <b>C)</b> <b>D)</b>. Marque a certa com <b>*</b> no fim (ou escreva <b>Resposta: B</b>). Opcional: <b>Explicação:</b> e <b>Tempo:</b> 30.</p>
-    <pre class="ex">1. O que é mediação?
+  <!-- ============ IMPORTAR / EXPORTAR ============ -->
+  <section class="pane" id="pane-io"><div class="page">
+    <h1>Importar e exportar</h1><p class="sub">Prepare as perguntas fora do editor (Docs, WhatsApp) e traga tudo de uma vez, ou guarde um backup.</p>
+    <div class="stack">
+      <div class="card">
+        <h3>Colar várias perguntas</h3>
+        <p class="hint" style="margin:0 0 12px">Deixe uma linha em branco entre as perguntas. A resposta certa leva um <b>*</b> no fim. A = vermelha, B = azul, C = amarela, D = verde.</p>
+        <textarea id="bulkTxt" placeholder="Cole aqui…"></textarea>
+        <div class="row" style="margin-top:12px"><select id="bulkMode"><option value="add">Adicionar no fim da lista</option><option value="replace">Substituir todas as perguntas</option></select>
+          <button class="btn" id="bBulkGo">Importar</button></div>
+        <div id="bulkMsg" class="hint"></div>
+        <details style="margin-top:12px"><summary class="muted" style="font-weight:800;font-size:14px">Ver formato de exemplo</summary>
+<pre class="exm">1. O que é mediação?
 A) Transmissão passiva de conteúdos
 B) Relação mediada por instrumentos e signos *
 C) Aprender isolado
 D) Recompensa por comportamento
 Explicação: O outro e a linguagem fazem a ponte.
 Tempo: 25</pre>
-    <div class="acts" style="border:0;padding-top:4px"><button class="btn teal" id="bBulkGo">Adicionar à lista</button><button class="btn alt" id="bBulkX">Cancelar</button></div>
-    <div id="bulkMsg" class="hint"></div>
-  </div>
+          <p class="hint">Também vale escrever <b>Resposta: B</b> no lugar do asterisco. Explicação e Tempo são opcionais.</p></details>
+      </div>
+      <div class="cols">
+        <div class="card"><h3>Exportar / backup</h3><p class="hint" style="margin:0 0 12px">Copia todas as perguntas em texto, no mesmo formato acima.</p>
+          <div class="row"><button class="btn out" id="bCopy">Copiar tudo</button><button class="btn out" id="bDown">Baixar .txt</button></div></div>
+        <div class="card"><h3 style="color:var(--bad)">Zona de risco</h3><p class="hint" style="margin:0 0 12px">Apaga as suas perguntas salvas e volta para as de exemplo.</p>
+          <button class="btn dng" id="bDef">Restaurar perguntas padrão</button></div>
+      </div>
+    </div>
+  </div></section>
 
-  <div id="list"></div>
+  <!-- ============ JOGO ============ -->
+  <section class="pane" id="pane-game"><div class="page">
+    <h1>Jogo</h1><p class="sub">Tudo o que você precisa para apresentar.</p>
+    <div class="stack">
+      <div class="card"><div class="hero">
+        <span class="led" id="led"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/></svg></span>
+        <div class="tt"><b id="gPhase">—</b><span class="muted" id="gInfo" style="font-weight:600;font-size:14px"></span></div>
+        <a class="btn" href="/host.html">Abrir telão</a></div>
+        <p class="hint" id="gLock"></p></div>
+      <div class="cols">
+        <div class="card"><h3>Antes de apresentar</h3><ul class="steps" id="chk"></ul></div>
+        <div class="card"><h3>Links</h3>
+          <div class="lab" style="margin-top:12px">Telão (só você)</div>
+          <div class="urlbox"><span id="uHost"></span><button class="btn out sm" data-copy="uHost">Copiar</button></div>
+          <div class="lab" style="margin-top:16px">Jogadores (celular)</div>
+          <div class="urlbox"><span id="uPlay"></span><button class="btn out sm" data-copy="uPlay">Copiar</button></div>
+          <img class="qrs" id="qrs" alt="QR code" style="margin-top:14px">
+        </div>
+      </div>
+      <div class="card"><h3>Reiniciar</h3><p class="hint" style="margin:0 0 12px">Apaga jogadores e pontos para começar um jogo novo. Use também se o jogo travar e você precisar editar.</p>
+        <button class="btn dng" id="bResetGame">Reiniciar jogo</button></div>
+    </div>
+  </div></section>
 </main>
-
-<div class="bar"><div class="in">
-  <div id="status">Carregando…</div>
-  <button class="btn teal big" id="bSave">Salvar</button>
-</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -181,192 +287,211 @@ const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 let KEY = sessionStorage.getItem('vq-host-key') || '';
 if (!KEY) { KEY = prompt('Chave do apresentador (HOST_KEY):') || ''; sessionStorage.setItem('vq-host-key', KEY); }
 
-let Qs = [], dirty = false, custom = false, draftT = 0;
-const SH = ['▲', '●', '■', '◆'];
-const blank = () => ({t:'', o:['', '', '', ''], c:-1, time:20, e:'', open:true, prev:false});
+let Qs = [], sel = 0, dirty = false, custom = false, draftT = 0, tab = 'q', G = null;
+const IC = [
+  '<svg viewBox="0 0 32 32"><path d="M16 4 29.5 27h-27z" fill="#fff"/></svg>',
+  '<svg viewBox="0 0 32 32"><path d="M16 1.5 30.5 16 16 30.5 1.5 16z" fill="#fff"/></svg>',
+  '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#fff"/></svg>',
+  '<svg viewBox="0 0 32 32"><rect x="4" y="4" width="24" height="24" rx="2" fill="#fff"/></svg>'];
+const CHECK = '<svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5L19.5 7"/></svg>';
+const ARR = {l:'<svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>', r:'<svg class="i" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>'};
+const COLOR = ['vermelha', 'azul', 'amarela', 'verde'];
+const blank = () => ({t:'', o:['', '', '', ''], c:-1, time:20, e:''});
+const plain = Qs => Qs.map(({t, o, c, time, e}) => ({t, o:[...o], c, time:+time, e}));
 
 /* ---------- servidor ---------- */
-async function api(action, extra){
-  const r = await fetch('/api/admin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({key:KEY, action, ...extra})});
+async function api(action, extra, url){
+  const r = await fetch(url || '/api/admin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({key:KEY, action, ...extra})});
   let j = {}; try { j = await r.json(); } catch (e) {}
   if (r.status === 401) {
     sessionStorage.removeItem('vq-host-key');
     KEY = prompt('Chave incorreta. Digite de novo:') || '';
     sessionStorage.setItem('vq-host-key', KEY);
-    if (KEY) return api(action, extra);
+    if (KEY) return api(action, extra, url);
   }
   if (!r.ok) throw new Error(j.error || 'Erro ' + r.status);
   return j;
 }
-function status(msg, cls){ const s = $('#status'); s.textContent = msg || ' '; s.className = cls || ''; }
+function status(msg, cls){ const s = $('#status'); s.textContent = msg || ' '; s.className = 'chip ' + (cls || ''); }
 let tt = 0;
-function toast(msg, cls){ const t = $('#toast'); t.textContent = msg; t.className = 'toast show ' + (cls || ''); clearTimeout(tt); tt = setTimeout(() => t.className = 'toast', 2600); }
+function toast(msg, cls){ const t = $('#toast'); t.textContent = msg; t.className = 'toast show ' + (cls || ''); clearTimeout(tt); tt = setTimeout(() => t.className = 'toast', 2800); }
+function updSave(){ const b = $('#bSave'); b.textContent = dirty ? 'Salvar' : 'Salvo'; b.classList.toggle('clean', !dirty); }
 
 /* ---------- validação ---------- */
 const problems = q => {
   const p = [];
   if (!q.t.trim()) p.push('sem enunciado');
   const miss = q.o.filter(x => !x.trim()).length;
-  if (miss) p.push(miss === 4 ? 'sem alternativas' : miss + ' alternativa' + (miss > 1 ? 's' : '') + ' vazia' + (miss > 1 ? 's' : ''));
-  if (q.c < 0) p.push('marque a correta');
-  else if (!q.o[q.c].trim()) p.push('a correta está vazia');
+  if (miss) p.push(miss === 4 ? 'sem alternativas' : miss + (miss > 1 ? ' alternativas vazias' : ' alternativa vazia'));
+  if (q.c < 0) p.push('marque a certa');
+  else if (!q.o[q.c].trim()) p.push('a certa está vazia');
   return p;
 };
+const allOk = () => Qs.length > 0 && Qs.every(q => !problems(q).length);
 
-/* ---------- rascunho automático (não perde nada se a página fechar) ---------- */
+/* ---------- rascunho automático ---------- */
 function saveDraft(){
   clearTimeout(draftT);
-  draftT = setTimeout(() => { try { if (dirty) localStorage.setItem('vq-draft', JSON.stringify({at:Date.now(), qs:Qs.map(({t, o, c, time, e}) => ({t, o, c, time, e}))})); } catch (e) {} }, 500);
+  draftT = setTimeout(() => { try { if (dirty) localStorage.setItem('vq-draft', JSON.stringify({at:Date.now(), qs:plain(Qs)})); } catch (e) {} }, 500);
 }
 const clearDraft = () => { try { localStorage.removeItem('vq-draft'); } catch (e) {} };
 function checkDraft(){
   let d = null; try { d = JSON.parse(localStorage.getItem('vq-draft') || 'null'); } catch (e) {}
   if (!d || !d.qs || !d.qs.length) return;
-  if (JSON.stringify(d.qs) === JSON.stringify(Qs.map(({t, o, c, time, e}) => ({t, o, c, time, e})))) { clearDraft(); return; }
+  if (JSON.stringify(d.qs) === JSON.stringify(plain(Qs))) { clearDraft(); return; }
   const h = new Date(d.at).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
-  $('#draftTxt').textContent = `📝 Há um rascunho não salvo (${d.qs.length} perguntas, de ${h}).`;
+  $('#draftTxt').textContent = `Há um rascunho não salvo (${d.qs.length} perguntas, de ${h}).`;
   $('#draftBox').classList.add('show');
-  $('#bRec').onclick = () => { Qs = d.qs.map(q => ({...q, o:[...q.o], open:false, prev:false})); setDirty(); render(); $('#draftBox').classList.remove('show'); toast('Rascunho recuperado. Toque em Salvar.', 'ok'); };
+  $('#bRec').onclick = () => { Qs = d.qs.map(q => ({...q, o:[...q.o]})); sel = 0; setDirty(); renderQ(); $('#draftBox').classList.remove('show'); toast('Rascunho recuperado. Clique em Salvar.', 'ok'); };
   $('#bDisc').onclick = () => { clearDraft(); $('#draftBox').classList.remove('show'); };
 }
 
 async function load(){
   try {
     const j = await api('get');
-    Qs = j.questions.map(q => ({...q, o:[...q.o], open:false, prev:false}));
-    custom = j.custom; dirty = false;
-    render(); status('Tudo salvo', 'ok'); checkDraft();
-  } catch (e) { status(e.message, 'bad'); $('#src').textContent = 'erro ao carregar'; }
+    Qs = j.questions.map(q => ({...q, o:[...q.o]}));
+    custom = j.custom; dirty = false; sel = 0;
+    renderQ(); updSave(); status('Tudo salvo', 'ok'); checkDraft();
+  } catch (e) { status(e.message, 'bad'); toast(e.message, 'bad'); }
 }
+function select(i, scroll){ sel = Math.max(0, Math.min(Qs.length - 1, i)); renderQ(); if (scroll !== false) { const el = document.querySelector('#list .th.on'); if (el && el.scrollIntoView) el.scrollIntoView({block:'nearest', inline:'center'}); } }
 
 async function save(){
-  clearErr();
   const bad = Qs.findIndex(q => problems(q).length);
   if (bad >= 0){
-    Qs[bad].open = true; render();
-    const el = document.querySelector(`[data-card="${bad}"]`); el.classList.add('err'); el.scrollIntoView({block:'center', behavior:'smooth'});
-    const m = `Pergunta ${bad + 1}: ${problems(Qs[bad]).join(', ')}.`; status(m, 'bad'); toast(m, 'bad'); return;
+    setTab('q'); select(bad);
+    const m = `Pergunta ${bad + 1}: ${problems(Qs[bad]).join(', ')}.`; status(m, 'bad'); toast(m, 'bad');
+    const s = document.querySelector('#editor .qcard'); if (s) s.classList.add('err'); return;
   }
   $('#bSave').disabled = true; status('Salvando…', 'warn');
   try {
-    const clean = Qs.map(({t, o, c, time, e}) => ({t, o, c, time:+time, e}));
-    const j = await api('save', {questions:clean});
-    dirty = false; custom = true; clearDraft(); render();
-    status(`Salvo · ${j.count} perguntas no ar`, 'ok'); toast(`✓ ${j.count} perguntas salvas!`, 'ok');
+    const j = await api('save', {questions:plain(Qs)});
+    dirty = false; custom = true; clearDraft(); renderQ(); updSave();
+    status(`Salvo · ${j.count} perguntas`, 'ok'); toast(`${j.count} perguntas salvas`, 'ok');
   } catch (e) {
     status(e.message, 'bad'); toast(e.message, 'bad');
-    const m = /Pergunta (\d+)/.exec(e.message);
-    if (m) { const i = +m[1] - 1; if (Qs[i]) { Qs[i].open = true; render(); const el = document.querySelector(`[data-card="${i}"]`); if (el) { el.classList.add('err'); el.scrollIntoView({block:'center', behavior:'smooth'}); } } }
+    const m = /Pergunta (\d+)/.exec(e.message); if (m && Qs[+m[1] - 1]) { setTab('q'); select(+m[1] - 1); }
   }
   $('#bSave').disabled = false;
 }
-function clearErr(){ document.querySelectorAll('.card.err').forEach(c => c.classList.remove('err')); }
-function setDirty(){ dirty = true; status('Alterações não salvas', 'warn'); saveDraft(); updateStats(); }
+function setDirty(){ dirty = true; status('Alterações não salvas', 'warn'); updSave(); saveDraft(); renderSide(); renderGame(); }
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); } });
 
-/* ---------- tela ---------- */
-function updateStats(){
+/* ---------- abas ---------- */
+function setTab(t){
+  tab = t;
+  document.querySelectorAll('.nav').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === 'pane-' + t));
+  if (t === 'game') { pollGame(); renderGame(); }
+  window.scrollTo({top:0});
+}
+document.querySelector('.rail').addEventListener('click', e => { const b = e.target.closest('.nav'); if (b) setTab(b.dataset.tab); });
+
+/* ---------- miniaturas (esquerda) ---------- */
+function renderSide(){
   const ok = Qs.filter(q => !problems(q).length).length, sec = Qs.reduce((a, q) => a + (+q.time || 20) + 8, 0);
-  $('#sCnt').textContent = Qs.length; $('#sOk').textContent = ok;
-  $('#sOkBox').className = 'stat ' + (Qs.length && ok === Qs.length ? 'good' : Qs.length ? 'bad' : '');
-  $('#sDur').textContent = sec < 60 ? sec + ' s' : Math.round(sec / 60) + ' min';
-  $('#src').textContent = custom ? '✓ usando as suas perguntas' : 'usando as perguntas padrão (ainda não salvou)';
-  $('#src').className = 'badge' + (custom ? ' on' : '');
-}
-function metaHTML(q){
-  const p = problems(q);
-  return `${p.length ? `<span class="tag warn">⚠ ${esc(p[0])}${p.length > 1 ? ' +' + (p.length - 1) : ''}</span>` : '<span class="tag ok">✓ completa</span>'}
-    ${q.c >= 0 ? `<span class="tag">Certa: ${'ABCD'[q.c]}</span>` : ''}<span class="tag">⏱ ${+q.time || 20}s</span>`;
-}
-function previewHTML(q){
-  return `<div class="cap">Assim aparece no celular do jogador</div><div class="q">${q.t.trim() ? esc(q.t) : '<span class="muted">(enunciado)</span>'}</div>
-    ${[0, 1, 2, 3].map(k => `<div class="po o${k} ${q.c === k ? 'ok' : ''}" style="background:var(--g${k})"><i>${SH[k]}</i><span>${q.o[k].trim() ? esc(q.o[k]) : '<span style="opacity:.5">(alternativa ' + 'ABCD'[k] + ')</span>'}</span></div>`).join('')}
-    ${q.e.trim() ? `<div class="ex">💡 ${esc(q.e)}</div>` : ''}`;
-}
-function cardHTML(q, i){
-  return `<div class="card${q.open ? ' open' : ''}" data-card="${i}" style="animation-delay:${Math.min(i, 8) * 30}ms">
-    <button class="head" data-act="toggle" data-i="${i}">
-      <span class="num">${i + 1}</span>
-      <span class="mid"><span class="title${q.t ? '' : ' empty'}">${q.t ? esc(q.t) : 'Pergunta sem enunciado'}</span><span class="meta">${metaHTML(q)}</span></span>
-      <span class="chev">▾</span>
-    </button>
-    <div class="body">
-      <label class="l">Enunciado <small>${q.t.length}/300</small></label>
-      <textarea data-i="${i}" data-f="t" maxlength="300" placeholder="Digite a pergunta…">${esc(q.t)}</textarea>
-      <label class="l">Alternativas <small>toque na letra para marcar a certa</small></label>
-      ${[0, 1, 2, 3].map(k => `
-        <div class="opt${q.c === k ? ' good' : ''}">
-          <button class="dot d${k}" data-act="correct" data-i="${i}" data-k="${k}" aria-label="Marcar ${'ABCD'[k]} como correta">${'ABCD'[k]}</button>
-          <input type="text" data-i="${i}" data-f="o" data-k="${k}" maxlength="150" value="${esc(q.o[k])}" placeholder="Alternativa ${'ABCD'[k]}">
-        </div>`).join('')}
-      <label class="l">Tempo para responder</label>
-      <div class="row2"><div class="presets">${[10, 20, 30, 45, 60].map(s => `<button class="pre${+q.time === s ? ' on' : ''}" data-act="time" data-i="${i}" data-s="${s}">${s}s</button>`).join('')}</div>
-        <input class="time" type="number" min="5" max="120" data-i="${i}" data-f="time" value="${q.time}" aria-label="Segundos"></div>
-      <label class="l">Explicação <small>aparece depois da resposta · opcional</small></label>
-      <textarea data-i="${i}" data-f="e" maxlength="400" placeholder="Por que essa é a resposta certa?">${esc(q.e)}</textarea>
-      <div class="prev${q.prev ? ' show' : ''}">${previewHTML(q)}</div>
-      <div class="acts">
-        <button class="btn alt" data-act="prev" data-i="${i}">👁 Prévia</button>
-        <button class="btn alt" data-act="up" data-i="${i}" ${i === 0 ? 'disabled' : ''}>↑</button>
-        <button class="btn alt" data-act="down" data-i="${i}" ${i === Qs.length - 1 ? 'disabled' : ''}>↓</button>
-        <button class="btn alt" data-act="dup" data-i="${i}">⧉ Duplicar</button>
-        <span class="sp"></span>
-        <button class="btn danger" data-act="del" data-i="${i}">🗑 Apagar</button>
-      </div>
-    </div>
-  </div>`;
-}
-function render(){
-  updateStats();
-  $('#list').innerHTML = Qs.map(cardHTML).join('') || '<div class="empty"><p style="font-size:42px;margin:0">📝</p><p class="muted" style="margin:6px 0 16px">Nenhuma pergunta ainda.</p><button class="btn teal" onclick="document.getElementById(\'bAdd\').click()">＋ Criar a primeira</button></div>';
-}
-/* atualiza só os pedaços que mudam (não perde o foco ao digitar) */
-function refreshCard(i, el){
-  const card = el.closest('.card'), q = Qs[i];
-  card.querySelector('.meta').innerHTML = metaHTML(q);
-  const t = card.querySelector('.title'); t.textContent = q.t || 'Pergunta sem enunciado'; t.classList.toggle('empty', !q.t);
-  card.querySelector('.prev').innerHTML = previewHTML(q);
-  card.querySelectorAll('.opt').forEach((o, k) => o.classList.toggle('good', q.c === k));
-  card.querySelector('label.l small').textContent = q.t.length + '/300';
-  card.querySelectorAll('.pre').forEach(p => p.classList.toggle('on', +p.dataset.s === +q.time));
+  $('#sInfo').textContent = `${Qs.length} · ${ok} ok · ~${sec < 60 ? sec + 's' : Math.round(sec / 60) + 'min'}`;
+  $('#list').innerHTML = Qs.map((q, i) => `<button class="th${i === sel ? ' on' : ''}" data-act="sel" data-i="${i}">
+      <span class="no">${i + 1}</span>${problems(q).length ? '<b class="wn">!</b>' : ''}
+      <span class="tq${q.t ? '' : ' blank'}">${q.t ? esc(q.t) : 'Sem enunciado'}</span>
+      <span class="tg">${[0, 1, 2, 3].map(k => `<i class="c${k}${q.c === k ? ' ok' : ''}"></i>`).join('')}</span></button>`).join('')
+    || '<p class="hint" style="text-align:center;margin:8px 0">Nenhuma pergunta ainda.</p>';
 }
 
-$('#list').addEventListener('input', e => {
-  const t = e.target, i = +t.dataset.i, f = t.dataset.f; if (isNaN(i) || !f) return;
-  if (f === 'o') Qs[i].o[+t.dataset.k] = t.value; else Qs[i][f] = t.value;
-  refreshCard(i, t); setDirty();
-});
-$('#list').addEventListener('click', e => {
-  const b = e.target.closest('[data-act]'); if (!b) return;
-  const i = +b.dataset.i, a = b.dataset.act;
-  if (a === 'toggle') { Qs[i].open = !Qs[i].open; b.parentElement.classList.toggle('open', Qs[i].open); return; }
-  if (a === 'correct') { Qs[i].c = Qs[i].c === +b.dataset.k ? -1 : +b.dataset.k; refreshCard(i, b); setDirty(); try { navigator.vibrate && navigator.vibrate(15); } catch (x) {} return; }
-  if (a === 'time') { Qs[i].time = +b.dataset.s; b.closest('.card').querySelector('input.time').value = Qs[i].time; refreshCard(i, b); setDirty(); return; }
-  if (a === 'prev') { Qs[i].prev = !Qs[i].prev; b.closest('.card').querySelector('.prev').classList.toggle('show', Qs[i].prev); return; }
-  if (a === 'up' && i > 0) [Qs[i - 1], Qs[i]] = [Qs[i], Qs[i - 1]];
-  if (a === 'down' && i < Qs.length - 1) [Qs[i + 1], Qs[i]] = [Qs[i], Qs[i + 1]];
-  if (a === 'dup') Qs.splice(i + 1, 0, {...Qs[i], o:[...Qs[i].o], open:true});
-  if (a === 'del') { if (!confirm(`Apagar a pergunta ${i + 1}?`)) return; Qs.splice(i, 1); }
-  setDirty(); render();
-  if (a === 'up' || a === 'down') { const n = a === 'up' ? i - 1 : i + 1, el = document.querySelector(`[data-card="${n}"]`); if (el) el.scrollIntoView({block:'center', behavior:'smooth'}); }
-});
+/* ---------- palco (centro) ---------- */
+function renderStage(){
+  const ed = $('#editor');
+  if (!Qs.length){ ed.innerHTML = `<div class="empty"><div class="big"><svg class="i" viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17z"/></svg></div><h1 style="font-size:22px">Vamos criar o quiz</h1>
+    <p class="muted" style="margin:8px 0 20px;font-weight:500">Crie a primeira pergunta ou cole várias de uma vez.</p>
+    <button class="btn" data-act="add">＋ Criar a primeira pergunta</button> <button class="btn out" data-act="goio">Colar várias</button></div>`; return; }
+  const q = Qs[sel], i = sel;
+  ed.innerHTML = `<div class="stage">
+    <div class="snav"><span class="pill">Pergunta ${i + 1} de ${Qs.length}</span>
+      <button class="icb" data-act="prevq" ${i === 0 ? 'disabled' : ''} aria-label="Anterior">${ARR.l}</button>
+      <button class="icb" data-act="nextq" ${i === Qs.length - 1 ? 'disabled' : ''} aria-label="Próxima">${ARR.r}</button></div>
+    <div class="qcard"><textarea data-f="t" maxlength="300" rows="3" placeholder="Digite a pergunta aqui">${esc(q.t)}</textarea><small id="cTxt">${q.t.length}/300</small></div>
+    <div class="agrid">${[0, 1, 2, 3].map(k => `
+      <div class="ans c${k}${q.c === k ? ' good' : ''}"><span class="shp">${IC[k]}</span>
+        <input type="text" data-f="o" data-k="${k}" maxlength="150" value="${esc(q.o[k])}" placeholder="Alternativa ${'ABCD'[k]}">
+        <button class="tog" data-act="correct" data-k="${k}" aria-label="Marcar ${'ABCD'[k]} como correta" title="Marcar como correta">${CHECK}</button></div>`).join('')}</div>
+    <p class="hint" style="text-align:center;margin:14px 0 0">É assim que o jogador vê. Toque no círculo para marcar a resposta certa.</p></div>`;
+}
 
-$('#bAdd').onclick = () => { Qs.push(blank()); setDirty(); render(); const el = document.querySelector(`[data-card="${Qs.length - 1}"]`); if (el) { el.scrollIntoView({block:'center', behavior:'smooth'}); setTimeout(() => el.querySelector('textarea').focus({preventScroll:true}), 350); } };
-$('#bAll').onclick = () => { const open = !Qs.every(q => q.open); Qs.forEach(q => q.open = open); render(); };
+/* ---------- ajustes (direita) ---------- */
+function checksHTML(q){
+  const m = q.o.filter(x => !x.trim()).length;
+  return [[q.t.trim().length > 0, 'Enunciado escrito'], [m === 0, m ? `Faltam ${m} alternativa${m > 1 ? 's' : ''}` : '4 alternativas preenchidas'], [q.c >= 0 && !!q.o[q.c].trim(), q.c >= 0 ? `Certa: ${'ABCD'[q.c]} (${COLOR[q.c]})` : 'Marque a resposta certa']]
+    .map(([ok, t]) => `<li class="${ok ? 'ok' : ''}"><i>${ok ? '✓' : '!'}</i>${t}</li>`).join('');
+}
+function renderInsp(){
+  const el = $('#insp');
+  if (!Qs.length){ el.innerHTML = ''; return; }
+  const q = Qs[sel], i = sel;
+  el.innerHTML = `
+    <div class="card"><div class="lab">Esta pergunta</div><ul class="checks" id="vlist">${checksHTML(q)}</ul></div>
+    <div class="card"><div class="lab">Resposta certa</div>
+      <div class="picks">${[0, 1, 2, 3].map(k => `<button class="pick c${k}${q.c === k ? ' on' : ''}" data-act="correct" data-k="${k}" aria-label="${'ABCD'[k]}">${IC[k]}</button>`).join('')}</div></div>
+    <div class="card"><div class="lab">Tempo para responder <span class="tval" id="tval">${q.time}s</span></div>
+      <input type="range" min="5" max="120" step="5" data-f="time" id="trange" value="${q.time}" aria-label="Segundos">
+      <div class="row" style="margin-top:10px">${[10, 20, 30, 45, 60].map(s => `<button class="pre${+q.time === s ? ' on' : ''}" data-act="time" data-s="${s}">${s}s</button>`).join('')}</div>
+      <button class="btn out sm block" style="margin-top:12px" data-act="alltime">Usar ${q.time}s em todas as perguntas</button></div>
+    <div class="card"><div class="lab">Explicação <small>opcional</small></div>
+      <textarea class="ex" data-f="e" maxlength="400" placeholder="Aparece para todos depois da resposta. Por que a alternativa certa é a certa?">${esc(q.e)}</textarea></div>
+    <div class="card"><div class="lab">Ações</div>
+      <div class="acts"><button class="btn out sm" data-act="up" ${i === 0 ? 'disabled' : ''}>↑ Subir</button><button class="btn out sm" data-act="down" ${i === Qs.length - 1 ? 'disabled' : ''}>↓ Descer</button>
+        <button class="btn out sm" data-act="dup">Duplicar</button><button class="btn dng sm" data-act="del">Apagar</button></div>
+      <p class="hint">Acertar rápido vale de 500 a 1000 pontos.</p></div>`;
+}
+function renderQ(){ renderSide(); renderStage(); renderInsp(); renderGame(); }
+
+/* digitar: atualiza só o necessário (não perde o foco) */
+function live(){
+  const q = Qs[sel]; if (!q) return;
+  const c = $('#cTxt'); if (c) c.textContent = q.t.length + '/300';
+  document.querySelectorAll('#editor .ans').forEach((o, k) => o.classList.toggle('good', q.c === k));
+  document.querySelectorAll('#insp .pick').forEach((o, k) => o.classList.toggle('on', q.c === k));
+  const v = $('#vlist'); if (v) v.innerHTML = checksHTML(q);
+  const tv = $('#tval'); if (tv) tv.textContent = q.time + 's';
+  document.querySelectorAll('#insp [data-act=time]').forEach(p => p.classList.toggle('on', +p.dataset.s === +q.time));
+  const ab = document.querySelector('#insp [data-act=alltime]'); if (ab) ab.textContent = `Usar ${q.time}s em todas as perguntas`;
+  document.querySelectorAll('.qcard.err').forEach(s => s.classList.remove('err'));
+}
+function onInput(e){
+  const t = e.target, f = t.dataset.f; if (!f || !Qs[sel]) return;
+  if (f === 'o') Qs[sel].o[+t.dataset.k] = t.value; else Qs[sel][f] = f === 'time' ? +t.value : t.value;
+  live(); setDirty();
+}
+$('#editor').addEventListener('input', onInput); $('#insp').addEventListener('input', onInput);
+function onClick(e){
+  const b = e.target.closest('[data-act]'); if (!b) return; const a = b.dataset.act, i = sel;
+  if (a === 'sel') { select(+b.dataset.i); return; }
+  if (a === 'add') { addQ(); return; }
+  if (a === 'goio') { setTab('io'); return; }
+  if (!Qs[i]) return;
+  if (a === 'correct') { Qs[i].c = Qs[i].c === +b.dataset.k ? -1 : +b.dataset.k; live(); setDirty(); try { navigator.vibrate && navigator.vibrate(15); } catch (x) {} return; }
+  if (a === 'time') { Qs[i].time = +b.dataset.s; const r = $('#trange'); if (r) r.value = Qs[i].time; live(); setDirty(); return; }
+  if (a === 'alltime') { Qs.forEach(q => q.time = Qs[i].time); setDirty(); toast(`Todas as perguntas: ${Qs[i].time} segundos`, 'ok'); return; }
+  if (a === 'prevq') { select(i - 1); return; }
+  if (a === 'nextq') { select(i + 1); return; }
+  if (a === 'up' && i > 0) { [Qs[i - 1], Qs[i]] = [Qs[i], Qs[i - 1]]; sel = i - 1; }
+  if (a === 'down' && i < Qs.length - 1) { [Qs[i + 1], Qs[i]] = [Qs[i], Qs[i + 1]]; sel = i + 1; }
+  if (a === 'dup') { Qs.splice(i + 1, 0, {...Qs[i], o:[...Qs[i].o]}); sel = i + 1; }
+  if (a === 'del') { if (!confirm(`Apagar a pergunta ${i + 1}?`)) return; Qs.splice(i, 1); sel = Math.max(0, Math.min(sel, Qs.length - 1)); }
+  setDirty(); renderQ();
+}
+$('#pane-q').addEventListener('click', onClick);
+function addQ(){ Qs.push(blank()); sel = Qs.length - 1; setDirty(); renderQ(); const el = document.querySelector('#list .th.on'); if (el && el.scrollIntoView) el.scrollIntoView({block:'nearest', inline:'center'}); setTimeout(() => { const t = document.querySelector('#editor textarea'); if (t) t.focus({preventScroll:true}); }, 150); }
+$('#bAdd').onclick = addQ;
 $('#bSave').onclick = save;
-$('#bDef').onclick = async () => {
-  if (!confirm('Voltar para as perguntas padrão? As suas perguntas salvas serão apagadas.')) return;
-  try { await api('defaults'); clearDraft(); await load(); toast('✓ Voltou às perguntas padrão.', 'ok'); } catch (e) { status(e.message, 'bad'); toast(e.message, 'bad'); }
-};
 
-/* ---------- colar em massa ---------- */
+/* ---------- importar / exportar ---------- */
 function parseBulk(text){
   const blocks = String(text).replace(/\r/g, '').split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
   const out = [], warns = [];
   blocks.forEach((b, bi) => {
     const lines = b.split('\n').map(l => l.trim()).filter(Boolean);
-    const q = {t: lines[0].replace(/^\d+\s*[\.\)\-:]\s*/, ''), o:['', '', '', ''], c:-1, time:20, e:'', open:true, prev:false};
+    const q = {t: lines[0].replace(/^\d+\s*[\.\)\-:]\s*/, ''), o:['', '', '', ''], c:-1, time:20, e:''};
     let cur = 't', m;
     for (const ln of lines.slice(1)){
       if ((m = ln.match(/^\(?([A-Da-d])[\)\.\-:]\s*(.*)$/))){
@@ -388,19 +513,61 @@ function parseBulk(text){
   });
   return {questions: out, warns};
 }
-$('#bBulk').onclick = () => { $('#bulk').classList.toggle('show'); $('#bulkTxt').focus(); };
-$('#bBulkX').onclick = () => { $('#bulk').classList.remove('show'); $('#bulkMsg').textContent = ''; };
+function toText(){
+  return Qs.map((q, i) => `${i + 1}. ${q.t}\n` + q.o.map((o, k) => `${'ABCD'[k]}) ${o}${q.c === k ? ' *' : ''}`).join('\n') + (q.e.trim() ? `\nExplicação: ${q.e}` : '') + `\nTempo: ${+q.time || 20}`).join('\n\n');
+}
 $('#bBulkGo').onclick = () => {
   const {questions, warns} = parseBulk($('#bulkTxt').value);
   if (!questions.length) { $('#bulkMsg').textContent = 'Não encontrei nenhuma pergunta no texto.'; return; }
-  Qs.push(...questions); setDirty(); render();
-  $('#bulkTxt').value = '';
-  $('#bulkMsg').innerHTML = `✓ ${questions.length} ${questions.length === 1 ? 'pergunta adicionada' : 'perguntas adicionadas'} no fim da lista.` +
-    (warns.length ? `<br><span style="color:var(--orange)">Atenção, ajuste antes de salvar:<br>• ${warns.map(esc).join('<br>• ')}</span>` : '');
-  toast(`${questions.length} adicionada(s). Toque em Salvar.`, 'ok');
+  if ($('#bulkMode').value === 'replace') { if (!confirm('Substituir TODAS as perguntas atuais pelas coladas?')) return; Qs = questions; sel = 0; }
+  else { sel = Qs.length; Qs.push(...questions); }
+  setDirty(); renderQ(); $('#bulkTxt').value = '';
+  $('#bulkMsg').innerHTML = `${questions.length} ${questions.length === 1 ? 'pergunta importada' : 'perguntas importadas'}. Revise na aba Perguntas e clique em Salvar.` +
+    (warns.length ? `<br><span style="color:var(--warn)">Atenção, ajuste antes de salvar:<br>• ${warns.map(esc).join('<br>• ')}</span>` : '');
+  toast(`${questions.length} importada(s). Clique em Salvar.`, 'ok');
+};
+async function copyText(t){ try { await navigator.clipboard.writeText(t); return true; } catch (e) { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (x) {} a.remove(); return ok; } }
+$('#bCopy').onclick = async () => { if (!Qs.length) { toast('Não há perguntas para copiar.', 'bad'); return; } toast(await copyText(toText()) ? 'Copiado. Cole onde quiser.' : 'Não consegui copiar.', 'ok'); };
+$('#bDown').onclick = () => { if (!Qs.length) { toast('Não há perguntas para baixar.', 'bad'); return; } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([toText()], {type:'text/plain;charset=utf-8'})); a.download = 'perguntas-quiz-vigotski.txt'; document.body.appendChild(a); a.click(); a.remove(); toast('Arquivo baixado.', 'ok'); };
+$('#bDef').onclick = async () => {
+  if (!confirm('Voltar para as perguntas padrão? As suas perguntas salvas serão apagadas.')) return;
+  try { await api('defaults'); clearDraft(); await load(); toast('Voltou às perguntas padrão.', 'ok'); } catch (e) { status(e.message, 'bad'); toast(e.message, 'bad'); }
 };
 
-load();
+/* ---------- aba jogo ---------- */
+const PH = {lobby:'Sala de espera', question:'Pergunta em andamento', reveal:'Mostrando a resposta', end:'Quiz terminado'};
+async function pollGame(){
+  try { const r = await fetch('/api/state?key=' + encodeURIComponent(KEY), {cache:'no-store'}); const s = await r.json(); if (!s.error) { G = s; renderGame(); } } catch (e) {}
+}
+setInterval(() => { if (document.visibilityState === 'visible') pollGame(); }, 4000);
+function renderGame(){
+  const origin = location.origin;
+  $('#uPlay').textContent = origin.replace(/^https?:\/\//, '') + '/'; $('#uHost').textContent = origin.replace(/^https?:\/\//, '') + '/host.html';
+  const qr = $('#qrs'); const src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=' + encodeURIComponent(origin + '/'); if (qr.getAttribute('src') !== src) qr.src = src;
+  const running = G && (G.phase === 'question' || G.phase === 'reveal');
+  $('#led').className = 'led ' + (!G ? '' : running ? 'go' : 'ok');
+  $('#gPhase').textContent = G ? PH[G.phase] || G.phase : 'Carregando…';
+  $('#gInfo').textContent = G ? `${G.nPlayers} ${G.nPlayers === 1 ? 'jogador' : 'jogadores'}` + (running ? ` · pergunta ${G.q + 1} de ${G.total}` : '') : '';
+  $('#gLock').textContent = running ? 'Com o jogo em andamento não dá para salvar perguntas. Termine ou reinicie o jogo.' : 'Você pode editar e salvar perguntas agora.';
+  $('#liveDot').innerHTML = running ? '<span class="live"></span>' : '';
+  const items = [
+    [Qs.length > 0, 'Tem pelo menos 1 pergunta'],
+    [allOk(), 'Todas as perguntas estão completas'],
+    [!dirty, 'Tudo está salvo'],
+    [G ? !running : false, 'O jogo está na sala de espera'],
+  ];
+  $('#chk').innerHTML = items.map(([ok, t]) => `<li class="${ok ? 'ok' : ''}"><i>${ok ? '✓' : '!'}</i>${t}</li>`).join('');
+}
+$('#bResetGame').onclick = async () => {
+  if (!confirm('Reiniciar o jogo? Todos os jogadores e pontos serão apagados.')) return;
+  try { await api('reset', {}, '/api/host'); toast('Jogo reiniciado.', 'ok'); pollGame(); } catch (e) { toast(e.message, 'bad'); }
+};
+document.addEventListener('click', async e => { const b = e.target.closest('[data-copy]'); if (!b) return; const t = 'https://' + document.getElementById(b.dataset.copy).textContent; toast(await copyText(t) ? 'Link copiado.' : 'Não consegui copiar.', 'ok'); });
+
+try { if (localStorage.getItem('vq-how') === '1') $('#how').style.display = 'none'; } catch (e) {}
+$('#howX').onclick = () => { $('#how').style.display = 'none'; try { localStorage.setItem('vq-how', '1'); } catch (e) {} };
+load(); pollGame();
+if (location.hash === '#jogo') setTab('game'); else if (location.hash === '#importar') setTab('io');
 </script>
 </body>
 </html>
