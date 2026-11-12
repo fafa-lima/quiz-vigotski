@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Admin · Quiz Vigotski</title>
+<style>
+:root{--bg:#0b1829;--surface:#112240;--surface2:#172d52;--border:#1e3a6e;--blue:#4f9cf9;--teal:#3ecfb2;--orange:#f9a84f;--pink:#c084fc;--text:#e8f0fe;--muted:#8aa9d3;--white:#fff;--red:#ff8a8a}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,Arial,sans-serif}
+body{padding-bottom:110px}
+button,input,textarea,select{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#0b1829ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.brand{display:flex;gap:10px;align-items:center;font-weight:900;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--teal));display:grid;place-items:center;color:#fff;font-weight:950}
+a.btn,.btn{display:inline-block;border:0;border-radius:99px;padding:10px 18px;background:var(--blue);color:#fff;font-weight:900;font-size:15px;text-decoration:none;cursor:pointer}
+.btn.alt{background:var(--surface2);border:1px solid var(--border);font-weight:800;font-size:14px;padding:9px 14px}
+.btn.teal{background:var(--teal);color:#051a16}
+.btn.danger{background:transparent;border:1px solid #5a2a2a;color:var(--red)}
+.btn:disabled{opacity:.5}
+main{width:min(820px,100%);margin:0 auto;padding:16px}
+h1{font-size:26px;margin:6px 0 4px;color:var(--white);letter-spacing:-.03em}
+.muted{color:var(--muted)}
+.badge{display:inline-block;border-radius:99px;padding:4px 12px;font-size:12px;font-weight:800;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.badge.on{color:var(--teal);border-color:#1d5a52}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;margin-bottom:12px;overflow:hidden}
+.card.err{border-color:#a04a4a}
+.head{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;padding:14px 16px;cursor:pointer}
+.num{flex-shrink:0;min-width:30px;height:30px;border-radius:10px;background:var(--surface2);display:grid;place-items:center;font-weight:900;font-size:13px;color:var(--teal)}
+.title{flex:1;font-weight:800;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.title.empty{color:var(--muted);font-style:italic;font-weight:600}
+.chev{color:var(--muted);transition:transform .2s}
+.card.open .chev{transform:rotate(180deg)}
+.body{display:none;padding:0 16px 16px;border-top:1px solid var(--border)}
+.card.open .body{display:block}
+label.l{display:block;font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin:14px 0 6px}
+textarea,input[type=text],input[type=number]{width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--border);background:var(--bg);outline:0;font-size:16px}
+textarea{min-height:76px;resize:vertical;line-height:1.4}
+textarea:focus,input:focus{border-color:var(--blue)}
+.opt{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.opt input[type=radio]{width:24px;height:24px;flex-shrink:0;accent-color:var(--teal)}
+.opt .dot{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:13px;color:#0b1829;flex-shrink:0}
+.d0{background:var(--blue)}.d1{background:var(--teal)}.d2{background:var(--orange)}.d3{background:var(--pink)}
+.row2{display:flex;gap:12px;align-items:end}
+.row2>div{flex:1}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.hint{font-size:13px;color:var(--muted);margin:6px 0 0;line-height:1.45}
+.bulk{display:none;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px}
+.bulk.show{display:block}
+.bulk textarea{min-height:220px;font-family:ui-monospace,Menlo,monospace;font-size:14px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px max(12px,env(safe-area-inset-bottom));background:#0b1829f2;backdrop-filter:blur(10px);border-top:1px solid var(--border)}
+#status{font-size:14px;font-weight:700;color:var(--muted)}
+#status.ok{color:var(--teal)}#status.bad{color:var(--red)}#status.warn{color:var(--orange)}
+.btn.big{padding:14px 26px;font-size:17px}
+pre.ex{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:13px;line-height:1.5;overflow:auto;white-space:pre-wrap;color:#c6d7f2}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="mark">V</span><span>Admin · Quiz Vigotski</span></div>
+  <div style="display:flex;gap:8px"><a class="btn alt" href="/host.html">📺 Telão</a></div>
+</header>
+
+<main>
+  <h1>Perguntas do quiz</h1>
+  <div><span class="badge" id="src">carregando…</span> <span class="badge" id="cnt"></span></div>
+  <p class="muted" style="margin:10px 0 0;line-height:1.5">Edite, reordene, apague ou crie perguntas. Marque a <b style="color:var(--white)">bolinha</b> da alternativa correta. Nada vale até tocar em <b style="color:var(--white)">Salvar</b>.</p>
+
+  <div class="tools">
+    <button class="btn alt" id="bAdd">＋ Nova pergunta</button>
+    <button class="btn alt" id="bBulk">📋 Colar várias de uma vez</button>
+    <button class="btn alt" id="bAll">▾ Abrir/fechar todas</button>
+    <button class="btn danger" id="bDef">↺ Restaurar padrão</button>
+  </div>
+
+  <div class="bulk" id="bulk">
+    <label class="l" style="margin-top:0">Cole suas perguntas (deixe uma linha em branco entre elas)</label>
+    <textarea id="bulkTxt" placeholder="Cole aqui…"></textarea>
+    <p class="hint">Formato: a 1ª linha é a pergunta; depois as alternativas <b>A)</b> <b>B)</b> <b>C)</b> <b>D)</b>. Marque a correta com um <b>*</b> no fim (ou escreva <b>Resposta: B</b>). Opcional: <b>Explicação:</b> e <b>Tempo:</b> 30.</p>
+    <pre class="ex">1. O que é mediação?
+A) Transmissão passiva de conteúdos
+B) Relação mediada por instrumentos e signos *
+C) Aprender isolado
+D) Recompensa por comportamento
+Explicação: O outro e a linguagem fazem a ponte.
+Tempo: 25</pre>
+    <div class="acts"><button class="btn teal" id="bBulkGo">Adicionar à lista</button><button class="btn alt" id="bBulkX">Cancelar</button></div>
+    <div id="bulkMsg" class="hint"></div>
+  </div>
+
+  <div id="list"></div>
+</main>
+
+<div class="bar">
+  <div id="status">&nbsp;</div>
+  <button class="btn teal big" id="bSave">Salvar perguntas</button>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let KEY = sessionStorage.getItem('vq-host-key') || '';
+if (!KEY) { KEY = prompt('Chave do apresentador (HOST_KEY):') || ''; sessionStorage.setItem('vq-host-key', KEY); }
+
+let Qs = [], dirty = false, custom = false;
+const blank = () => ({t:'', o:['', '', '', ''], c:-1, time:20, e:'', open:true});
+
+/* ---------- servidor ---------- */
+async function api(action, extra){
+  const r = await fetch('/api/admin', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({key:KEY, action, ...extra})});
+  let j = {}; try { j = await r.json(); } catch (e) {}
+  if (r.status === 401) {
+    sessionStorage.removeItem('vq-host-key');
+    KEY = prompt('Chave incorreta. Digite de novo:') || '';
+    sessionStorage.setItem('vq-host-key', KEY);
+    if (KEY) return api(action, extra);
+  }
+  if (!r.ok) throw new Error(j.error || 'Erro ' + r.status);
+  return j;
+}
+function status(msg, cls){ const s = $('#status'); s.textContent = msg || ' '; s.className = cls || ''; }
+
+async function load(){
+  try {
+    const j = await api('get');
+    Qs = j.questions.map(q => ({...q, o:[...q.o], open:false}));
+    custom = j.custom; dirty = false;
+    render(); status('');
+  } catch (e) { status(e.message, 'bad'); $('#src').textContent = 'erro ao carregar'; }
+}
+
+async function save(){
+  clearErr();
+  $('#bSave').disabled = true; status('Salvando…');
+  try {
+    const clean = Qs.map(({t, o, c, time, e}) => ({t, o, c, time:+time, e}));
+    const j = await api('save', {questions:clean});
+    dirty = false; custom = true; render();
+    status(`✓ Salvo! ${j.count} perguntas no ar.`, 'ok');
+  } catch (e) {
+    status(e.message, 'bad');
+    const m = /Pergunta (\d+)/.exec(e.message);
+    if (m) { const i = +m[1] - 1; if (Qs[i]) { Qs[i].open = true; render(); const el = document.querySelector(`[data-card="${i}"]`); if (el) { el.classList.add('err'); el.scrollIntoView({block:'center', behavior:'smooth'}); } } }
+  }
+  $('#bSave').disabled = false;
+}
+function clearErr(){ document.querySelectorAll('.card.err').forEach(c => c.classList.remove('err')); }
+function setDirty(){ if (!dirty) { dirty = true; status('Alterações não salvas', 'warn'); } }
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------- tela ---------- */
+function render(){
+  $('#src').textContent = custom ? '✓ usando as suas perguntas' : 'usando as perguntas padrão (ainda não salvou)';
+  $('#src').className = 'badge' + (custom ? ' on' : '');
+  $('#cnt').textContent = Qs.length + (Qs.length === 1 ? ' pergunta' : ' perguntas');
+  $('#list').innerHTML = Qs.map((q, i) => `
+    <div class="card${q.open ? ' open' : ''}" data-card="${i}">
+      <button class="head" data-act="toggle" data-i="${i}">
+        <span class="num">${i + 1}</span>
+        <span class="title${q.t ? '' : ' empty'}">${q.t ? esc(q.t) : 'Pergunta sem enunciado'}</span>
+        <span class="chev">▾</span>
+      </button>
+      <div class="body">
+        <label class="l">Enunciado</label>
+        <textarea data-i="${i}" data-f="t" maxlength="300">${esc(q.t)}</textarea>
+        <label class="l">Alternativas · marque a correta</label>
+        ${[0, 1, 2, 3].map(k => `
+          <div class="opt">
+            <input type="radio" name="c${i}" value="${k}" data-i="${i}" data-f="c" ${q.c === k ? 'checked' : ''} aria-label="Alternativa ${'ABCD'[k]} é a correta">
+            <span class="dot d${k}">${'ABCD'[k]}</span>
+            <input type="text" data-i="${i}" data-f="o" data-k="${k}" maxlength="150" value="${esc(q.o[k])}" placeholder="Alternativa ${'ABCD'[k]}">
+          </div>`).join('')}
+        <div class="row2">
+          <div><label class="l">Tempo (segundos)</label><input type="number" min="5" max="120" data-i="${i}" data-f="time" value="${q.time}"></div>
+        </div>
+        <label class="l">Explicação (aparece depois da resposta)</label>
+        <textarea data-i="${i}" data-f="e" maxlength="400" placeholder="Opcional">${esc(q.e)}</textarea>
+        <div class="acts">
+          <button class="btn alt" data-act="up" data-i="${i}" ${i === 0 ? 'disabled' : ''}>↑ Subir</button>
+          <button class="btn alt" data-act="down" data-i="${i}" ${i === Qs.length - 1 ? 'disabled' : ''}>↓ Descer</button>
+          <button class="btn alt" data-act="dup" data-i="${i}">⧉ Duplicar</button>
+          <button class="btn danger" data-act="del" data-i="${i}">🗑 Apagar</button>
+        </div>
+      </div>
+    </div>`).join('') || '<p class="muted">Nenhuma pergunta. Toque em "Nova pergunta".</p>';
+}
+
+/* digitação: atualiza o modelo sem redesenhar (não perde o foco) */
+$('#list').addEventListener('input', e => {
+  const t = e.target, i = +t.dataset.i, f = t.dataset.f; if (isNaN(i) || !f) return;
+  if (f === 'o') Qs[i].o[+t.dataset.k] = t.value;
+  else if (f === 'c') Qs[i].c = +t.value;
+  else if (f === 'time') Qs[i].time = t.value;
+  else Qs[i][f] = t.value;
+  if (f === 't') { const el = t.closest('.card').querySelector('.title'); el.textContent = t.value || 'Pergunta sem enunciado'; el.classList.toggle('empty', !t.value); }
+  setDirty();
+});
+$('#list').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const i = +b.dataset.i, a = b.dataset.act;
+  if (a === 'toggle') { Qs[i].open = !Qs[i].open; b.parentElement.classList.toggle('open', Qs[i].open); return; }
+  if (a === 'up' && i > 0) [Qs[i - 1], Qs[i]] = [Qs[i], Qs[i - 1]];
+  if (a === 'down' && i < Qs.length - 1) [Qs[i + 1], Qs[i]] = [Qs[i], Qs[i + 1]];
+  if (a === 'dup') Qs.splice(i + 1, 0, {...Qs[i], o:[...Qs[i].o], open:true});
+  if (a === 'del') { if (!confirm(`Apagar a pergunta ${i + 1}?`)) return; Qs.splice(i, 1); }
+  setDirty(); render();
+});
+
+$('#bAdd').onclick = () => { Qs.push(blank()); setDirty(); render(); const el = document.querySelector(`[data-card="${Qs.length - 1}"]`); if (el) el.scrollIntoView({block:'center', behavior:'smooth'}); };
+$('#bAll').onclick = () => { const open = !Qs.every(q => q.open); Qs.forEach(q => q.open = open); render(); };
+$('#bSave').onclick = save;
+$('#bDef').onclick = async () => {
+  if (!confirm('Voltar para as perguntas padrão? As suas perguntas salvas serão apagadas.')) return;
+  try { await api('defaults'); await load(); status('✓ Voltou às perguntas padrão.', 'ok'); } catch (e) { status(e.message, 'bad'); }
+};
+
+/* ---------- colar em massa ---------- */
+function parseBulk(text){
+  const blocks = String(text).replace(/\r/g, '').split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+  const out = [], warns = [];
+  blocks.forEach((b, bi) => {
+    const lines = b.split('\n').map(l => l.trim()).filter(Boolean);
+    const q = {t: lines[0].replace(/^\d+\s*[\.\)\-:]\s*/, ''), o:['', '', '', ''], c:-1, time:20, e:'', open:true};
+    let cur = 't', m;
+    for (const ln of lines.slice(1)){
+      if ((m = ln.match(/^\(?([A-Da-d])[\)\.\-:]\s*(.*)$/))){
+        const k = 'abcd'.indexOf(m[1].toLowerCase()); let txt = m[2].trim();
+        if (/^\*|\*$/.test(txt)) { q.c = k; txt = txt.replace(/^\*+\s*|\s*\*+$/g, '').trim(); }
+        q.o[k] = txt; cur = 'o' + k;
+      } else if ((m = ln.match(/^(explica[cç][aã]o|coment[aá]rio)\s*:\s*(.*)$/i))) { q.e = m[2].trim(); cur = 'e'; }
+      else if ((m = ln.match(/^(resposta|correta|gabarito)\s*:\s*\(?([A-Da-d])\)?\.?\s*$/i))) { q.c = 'abcd'.indexOf(m[2].toLowerCase()); cur = null; }
+      else if ((m = ln.match(/^tempo\s*:\s*(\d+)/i))) { q.time = Math.min(120, Math.max(5, +m[1])); cur = null; }
+      else if (cur === 'e') q.e += ' ' + ln;
+      else if (cur === 't') q.t += ' ' + ln;
+      else if (cur && cur[0] === 'o') q.o[+cur[1]] += ' ' + ln;
+    }
+    const miss = [];
+    if (q.o.some(x => !x)) miss.push('faltam alternativas');
+    if (q.c < 0) miss.push('sem resposta correta marcada');
+    if (miss.length) warns.push(`Pergunta ${bi + 1} (“${q.t.slice(0, 40)}”): ${miss.join(' e ')}`);
+    out.push(q);
+  });
+  return {questions: out, warns};
+}
+$('#bBulk').onclick = () => { $('#bulk').classList.toggle('show'); $('#bulkTxt').focus(); };
+$('#bBulkX').onclick = () => { $('#bulk').classList.remove('show'); $('#bulkMsg').textContent = ''; };
+$('#bBulkGo').onclick = () => {
+  const {questions, warns} = parseBulk($('#bulkTxt').value);
+  if (!questions.length) { $('#bulkMsg').textContent = 'Não encontrei nenhuma pergunta no texto.'; return; }
+  Qs.push(...questions); setDirty(); render();
+  $('#bulkTxt').value = '';
+  $('#bulkMsg').innerHTML = `✓ ${questions.length} ${questions.length === 1 ? 'pergunta adicionada' : 'perguntas adicionadas'} no fim da lista.` +
+    (warns.length ? `<br><span style="color:var(--orange)">Atenção, ajuste antes de salvar:<br>• ${warns.map(esc).join('<br>• ')}</span>` : '');
+  status(`${questions.length} adicionada(s). Toque em Salvar.`, 'warn');
+};
+
+load();
+</script>
+</body>
+</html>
