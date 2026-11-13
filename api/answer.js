@@ -20,6 +20,7 @@ module.exports = async (req, res) => {
     if (g.phase !== 'question' || !Q || now > +g.t0 + Q.time * 1000 + 1500) {
       return res.status(200).json({ ok: false, late: true });
     }
+    if (now < +g.t0 - 400) return res.status(200).json({ ok: false, early: true });   /* ainda na contagem regressiva */
     const ms = Math.max(0, now - +g.t0);
     const [added] = await redis([['HSETNX', K.ans(+g.q), id, `${c}:${ms}`]]);
     if (added === 1 && c === Q.c) {

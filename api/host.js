@@ -9,7 +9,8 @@ module.exports = async (req, res) => {
     if (!process.env.HOST_KEY) return res.status(500).json({ error: 'HOST_KEY não está definida na Vercel (veja o README).' });
     if (!hostOK(key)) return res.status(401).json({ error: 'Chave do apresentador incorreta.' });
 
-    const now = String(Date.now());
+    /* a pergunta só "vale" depois da contagem regressiva 3-2-1 (COUNTDOWN_MS) */
+    const now = String(Date.now() + 3000);
     if (action === 'start') {
       await redis([['HSET', K.game, 'phase', 'question', 'q', '0', 't0', now]]);
     } else if (action === 'reveal') {
