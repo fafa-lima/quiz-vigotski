@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#46178f">
+<title>Controle · Seminário Vigotski</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#46178f;color:#fff;overscroll-behavior:none}
+body{display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom));gap:12px;user-select:none}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:.95}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ffb020;margin-right:8px}
+.dot.on{background:#3ddc84}
+.card{background:#fff;color:#2b0f5e;border-radius:18px;padding:16px 18px;box-shadow:0 4px 0 #0003}
+.card small{display:block;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#7a55c4;font-size:11px;margin-bottom:4px}
+.who{font-weight:800;font-size:14px;color:#7a55c4}
+.title{font-weight:900;font-size:22px;line-height:1.15;margin:2px 0 0}
+.count{font-size:34px;font-weight:900;margin:0}
+.next{font-size:14px;font-weight:700;color:#5b3d99;margin-top:8px}
+.grid{flex:1;display:grid;grid-template-columns:1fr 1.6fr;gap:12px;min-height:0}
+button{font:inherit;border:0;border-radius:22px;font-weight:900;color:#fff;box-shadow:0 6px 0 #0004;transition:transform .06s,box-shadow .06s;touch-action:manipulation}
+button:active{transform:translateY(5px);box-shadow:0 1px 0 #0004}
+#prev{background:#1368ce;font-size:20px}
+#next{background:#26890c;font-size:30px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.row button{background:#d89e00;padding:14px 6px;font-size:14px;border-radius:16px;box-shadow:0 4px 0 #0004}
+.row button:active{transform:translateY(3px);box-shadow:0 1px 0 #0004}
+.err{background:#e21b3c;border-radius:12px;padding:10px 12px;font-weight:700;font-size:13px;display:none}
+.join{display:grid;gap:12px;margin:auto 0}
+.join input{font:inherit;font-weight:900;font-size:28px;text-align:center;letter-spacing:.2em;text-transform:uppercase;border:0;border-radius:16px;padding:16px;color:#2b0f5e}
+.join button{background:#111;padding:16px;font-size:18px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="bar"><span><span class="dot" id="dot"></span><span id="st">Conectando…</span></span><span id="code"></span></div>
+
+<div class="join" id="join" hidden>
+  <div class="card"><small>Controle remoto</small><p class="title" style="font-size:18px">Digite o código que aparece no painel (botão 📱 Controle)</p></div>
+  <input id="inp" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="CÓDIGO">
+  <button id="go">Conectar</button>
+</div>
+
+<div id="ctl" style="display:contents" hidden>
+  <div class="card">
+    <small id="who">Slide atual</small>
+    <p class="count" id="count">– / –</p>
+    <p class="title" id="title">Aguardando o painel…</p>
+    <div class="next" id="nx"></div>
+  </div>
+  <div class="err" id="err"></div>
+  <div class="grid">
+    <button id="prev">◀ Voltar</button>
+    <button id="next">Avançar ▶</button>
+  </div>
+  <div class="row">
+    <button data-c="reveal">Revelar aos poucos</button>
+    <button data-c="index">Índice</button>
+    <button data-c="theme">Tema</button>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const q = new URLSearchParams(location.search);
+let code = (q.get('c') || localStorage.getItem('vq-rc') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+let wake = null;
+
+async function api(body){
+  const r = await fetch('/api/remote', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code, ...body})});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Falha de conexão');
+  return j;
+}
+function setErr(m){ const e = $('#err'); e.textContent = m || ''; e.style.display = m ? 'block' : 'none'; }
+function buzz(){ try { navigator.vibrate && navigator.vibrate(18); } catch(e){} }
+
+async function cmd(c, arg){
+  buzz();
+  try { await api({cmd:c, arg}); setErr(''); } catch(e){ setErr(e.message); }
+}
+function start(){
+  localStorage.setItem('vq-rc', code);
+  $('#join').hidden = true; $('#ctl').hidden = false;
+  $('#code').textContent = code;
+  $('#prev').onclick = () => cmd('prev');
+  $('#next').onclick = () => cmd('next');
+  document.querySelectorAll('[data-c]').forEach(b => b.onclick = () => cmd(b.dataset.c));
+  poll(); setInterval(poll, 1200);
+  try { navigator.wakeLock && navigator.wakeLock.request('screen').then(w => wake = w).catch(() => {}); } catch(e){}
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') try { navigator.wakeLock.request('screen').then(w => wake = w); } catch(e){} });
+}
+async function poll(){
+  try {
+    const r = await fetch('/api/remote?code=' + code, {cache:'no-store'});
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error);
+    const live = j.info && (j.now - j.ping) < 15000;
+    $('#dot').classList.toggle('on', !!live);
+    $('#st').textContent = live ? 'Conectado ao painel' : (j.info ? 'Painel sem sinal…' : 'Aguardando o painel');
+    if (j.info){
+      $('#count').textContent = (j.info.i + 1) + ' / ' + j.info.total;
+      $('#title').textContent = j.info.title || '';
+      $('#who').textContent = j.info.who || 'Slide atual';
+      $('#nx').textContent = j.info.next ? 'Próximo: ' + j.info.next : '';
+    }
+  } catch(e){ $('#dot').classList.remove('on'); $('#st').textContent = 'Sem conexão'; }
+}
+if (code.length >= 4) start();
+else { $('#join').hidden = false; $('#st').textContent = 'Controle remoto';
+  $('#go').onclick = () => { code = $('#inp').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); if (code.length >= 4) start(); }; }
+</script>
+</body>
+</html>
