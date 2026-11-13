@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#46178f">
+<title>Participe · Seminário Vigotski</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#46178f;color:#fff}
+body{min-height:100vh;display:flex;flex-direction:column;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:16px;opacity:.95}
+.logo i{width:30px;height:30px;border-radius:7px;background:#fff;color:#46178f;display:grid;place-items:center;font-style:normal;font-size:18px}
+main{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;max-width:520px;width:100%;margin:0 auto;animation:in .35s}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+.eyebrow{font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+h1{margin:0;font-size:clamp(26px,7vw,36px);line-height:1.15;font-weight:900}
+p{margin:0;font-weight:600;opacity:.92;line-height:1.45}
+.card{background:#fff;color:#2b0f5e;border-radius:16px;padding:16px;box-shadow:0 5px 0 #0003;display:grid;gap:12px}
+input{font:inherit;font-weight:800;font-size:22px;border:2px solid #d8c9f2;border-radius:12px;padding:14px;width:100%;color:#2b0f5e;text-align:center}
+input:focus{outline:0;border-color:#46178f}
+button{font:inherit;border:0;border-radius:14px;font-weight:900;color:#fff;padding:16px;font-size:19px;box-shadow:0 5px 0 #0004;touch-action:manipulation}
+button:active:not([disabled]){transform:translateY(4px);box-shadow:0 1px 0 #0004}
+button[disabled]{opacity:.5}
+.go{background:#26890c}
+.big{background:#26890c;font-size:clamp(28px,9vw,40px);padding:clamp(34px,12vh,70px) 16px;border-radius:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{background:#efe7fa;color:#46178f;font-weight:800;border-radius:99px;padding:6px 14px;font-size:15px}
+.err{color:#e21b3c;font-weight:700;font-size:14px;min-height:18px;text-align:center}
+.center{text-align:center}
+.spin{width:44px;height:44px;border-radius:50%;border:5px solid #ffffff40;border-top-color:#fff;animation:sp 1s linear infinite;margin:0 auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.tick{font-size:72px;line-height:1}
+.conn{position:fixed;left:0;right:0;top:0;background:#e21b3c;text-align:center;font-weight:800;font-size:13px;padding:6px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="conn" id="conn" hidden>Sem conexão… tentando de novo</div>
+<div class="logo"><i>V</i>Participe</div>
+<main id="app"></main>
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let pid = ''; try { pid = localStorage.getItem('vq-pid') || ''; } catch (e) {}
+if (!/^[A-Za-z0-9]{6,40}$/.test(pid)) { pid = Array.from(crypto.getRandomValues(new Uint8Array(10)), b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join(''); try { localStorage.setItem('vq-pid', pid); } catch (e) {} }
+const vib = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+let S = null, view = '', sentLocal = {};
+try { sentLocal = JSON.parse(localStorage.getItem('vq-sent') || '{}'); } catch (e) {}
+const saveSent = () => { try { localStorage.setItem('vq-sent', JSON.stringify(sentLocal)); } catch (e) {} };
+function setView(key, html, after){ if (key === view) return; view = key; $('#app').innerHTML = html; if (after) after(); }
+
+async function post(body){
+  const r = await fetch('/api/live', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pid, ...body})});
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Erro'); return j;
+}
+async function poll(){
+  try {
+    const r = await fetch('/api/live?pid=' + pid, {cache:'no-store'});
+    const j = await r.json(); if (j.error) throw new Error(j.error);
+    S = j; $('#conn').hidden = true; render();
+  } catch (e) { $('#conn').hidden = false; }
+}
+setInterval(poll, 1500); poll();
+
+const LV = ['sem dica', 'com a dica 1', 'com a dica 2', 'com a dica 3'];
+function render(){
+  const a = S && S.act;
+  if (!a) return setView('wait', `<div class="center" style="display:grid;gap:14px"><div class="spin"></div><h1>Aguarde…</h1><p>O apresentador vai abrir uma atividade em instantes.</p></div>`);
+  if (a.type === 'cloud'){
+    const mine = (sentLocal['c:' + a.id] || []);
+    const left = Math.max(0, 3 - Math.max(S.mine || 0, mine.length));
+    const key = 'c' + a.id + (left ? 'o' : 'x');
+    if (left === 0) return setView(key, `<div class="center" style="display:grid;gap:14px"><div class="tick">🎉</div><h1>Pronto!</h1><p>Olhe para o telão: suas palavras estão lá.</p>
+        <div class="chips">${mine.map(w => `<span class="chip">${esc(w)}</span>`).join('')}</div></div>`);
+    setView(key, `<div><div class="eyebrow">Nuvem de palavras</div><h1>${esc(a.prompt || 'Digite uma palavra')}</h1></div>
+      <div class="card"><input id="w" maxlength="24" placeholder="Uma palavra" autocomplete="off" enterkeyhint="send">
+        <div class="err" id="err"></div><button class="go" id="send">Enviar</button>
+        <div class="chips" id="mine">${mine.map(w => `<span class="chip">${esc(w)}</span>`).join('')}</div></div>
+      <p class="center" id="left"></p>`, () => {
+        const send = async () => {
+          const w = $('#w').value.trim(); if (!w) return;
+          $('#send').disabled = true;
+          try {
+            const j = await post({action:'submit', word:w});
+            if (j.ok){ (sentLocal['c:' + a.id] = sentLocal['c:' + a.id] || []).push(w.toLowerCase()); saveSent(); vib(25); view = ''; render(); }
+            else if (j.full){ sentLocal['c:' + a.id] = sentLocal['c:' + a.id] || ['…','…','…']; saveSent(); view = ''; render(); }
+            else $('#err').textContent = 'A atividade foi encerrada.';
+          } catch (e) { $('#err').textContent = e.message; }
+          if ($('#send')) $('#send').disabled = false;
+        };
+        $('#send').onclick = send; $('#w').onkeydown = e => { if (e.key === 'Enter') send(); };
+      });
+    const l = $('#left'); if (l) l.textContent = left === 3 ? 'Você pode enviar até 3 palavras.' : `Você ainda pode enviar ${left}.`;
+  } else if (a.type === 'zdi'){
+    const z = S.zmine;
+    if (z !== null && z !== undefined)
+      return setView('z' + a.id + a.ch + 'd', `<div class="center" style="display:grid;gap:12px"><div class="tick">✅</div><h1>Registrado!</h1>
+        <p>Você resolveu <b>${LV[z]}</b>.<br>Olhe o telão: sua resposta já entrou no gráfico.</p></div>`);
+    setView('z' + a.id + a.ch + 'o', `<div class="center" style="display:grid;gap:12px"><div class="eyebrow">Desafio ${a.ch + 1}</div>
+      <h1>Olhe para o telão e tente resolver</h1><p id="hl"></p>
+      <button class="big" id="ok">✓ Resolvi!</button><div class="err" id="err"></div></div>`, () => {
+        $('#ok').onclick = async () => { $('#ok').disabled = true; vib(30);
+          try { await post({action:'zdi'}); view = ''; poll(); } catch (e) { $('#err').textContent = e.message; $('#ok').disabled = false; } };
+      });
+    const h = $('#hl'); if (h) h.textContent = a.hint ? `A dica ${a.hint} já foi liberada: use-a!` : 'Tente primeiro sem ajuda. Se travar, espere uma dica.';
+  }
+}
+</script>
+</body>
+</html>
